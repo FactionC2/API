@@ -148,6 +148,8 @@ class RpcClient(object):
                 # everyone using Faction and the API is going to reply back with the error message when it encounters
                 # it.
                 if errorMessageAnnouncement['Source'] != 'API':
+                    self.socketio.emit('errorMessageAnnouncement', errorMessageAnnouncement)
+                else:
                     self.socketio.emit('errorMessageAnnouncement', errorMessageAnnouncement, broadcast=True)
 
             elif message.properties['message_type'] == 'NewTransport':
