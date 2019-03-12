@@ -19,7 +19,7 @@ from models.payload import Payload
 payload_upload_dir = os.path.join(UPLOAD_DIR, 'payloads/')
 
 def payload_json(payload):
-    print("[agent_json] Working on %s" % payload)
+    print("[payload_json] Working on %s" % payload)
 
     lastDownloaded = None
     if payload.LastDownloaded:
@@ -69,6 +69,7 @@ def payload_json(payload):
         'Enabled': payload.Enabled,
         'Visible': payload.Visible
     }
+    print("[payload_json] returning {0}".format(result))
     return result
 
 def get_payload(payload_id, include_hidden=False):
@@ -153,7 +154,7 @@ def new_payload(description, agent_type, agent_type_format, transport_id, agent_
     })
 
     print("[payload:new_payload] Publishing: {0}".format(publish_message))
-    message_id = rpc_client.send_request("Payload", publish_message, callback=True)
+    message_id = rpc_client.send_request("NewPayload", publish_message, callback=True)
 
     # Wait for our response
     # TODO: Add actual timeout here.

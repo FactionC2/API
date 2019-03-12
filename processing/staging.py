@@ -62,7 +62,6 @@ def get_staging_response(staging_id):
     })
 
 
-# TODO: This should be handled by core
 def new_staging_message(payload_name, staging_id, message):
     print("[staging_message:new_staging_message] Got staging request. PayloadName: {0} ID: {1}".format(payload_name, staging_id))
 
@@ -72,21 +71,17 @@ def new_staging_message(payload_name, staging_id, message):
     else:
         decoded_response = b64decode(message)
         response_dict = json.loads(decoded_response)
-        staging_message = StagingMessage()
-        staging_message.PayloadName = payload_name
-        staging_message.IV = response_dict['IV']
-        staging_message.HMAC = response_dict['HMAC']
-        staging_message.Message = response_dict['Message']
-        staging_msg_json = staging_message_json(staging_message)
+        response_dict["PayloadName"] = payload_name
 
-    print("[staging_message:new_staging_message] Publishing: {0}".format(staging_msg_json))
-    message_id = rpc_client.send_request('StagingMessage', staging_msg_json, callback=True)
+
+    print("[staging_message:new_staging_message] Publishing: {0}".format(response_dict))
+    message_id = rpc_client.send_request('NewStagingMessage', response_dict, callback=True)
 
     # Wait for our response
-    print("[staging_message:new_staging_message] Waiting for 60 seconds")
+    print("[staging_message:new_staging_message] Waiting for 10 seconds")
     i = 0
-    while rpc_client.queue[message_id] is None and i < 60:
-        print("[staging_message:new_staging_message] Waiting for {0} seconds".format(60 - i))
+    while rpc_client.queue[message_id] is None and i < 10:
+        print("[staging_message:new_staging_message] Waiting for {0} seconds".format(10 - i))
         sleep(1)
         i += 1
 
