@@ -18,7 +18,7 @@ RUN addgroup -S -g 1337 gunicorn && \
     pip3 install --upgrade pip  && \
     pip3 install pipenv  && \
     pipenv install --system && \
-    mkdir ./cache && \
+    mkdir -p ./cache && \
     chown gunicorn:gunicorn ./cache
 EXPOSE 5000
 USER gunicorn
