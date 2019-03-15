@@ -66,6 +66,7 @@ class RpcClient(object):
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='ConsoleMessageAnnouncement')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='AgentUpdated')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='ErrorMessageAnnouncement')
+        self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='NewFactionFile')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='NewTransport')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='PayloadUpdate')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='PayloadUpdated')
@@ -151,6 +152,12 @@ class RpcClient(object):
                     self.socketio.emit('errorMessageAnnouncement', errorMessageAnnouncement)
                 else:
                     self.socketio.emit('errorMessageAnnouncement', errorMessageAnnouncement, broadcast=True)
+
+            elif message.properties['message_type'] == 'NewFactionFile':
+                print("[AMPQSTORM:_on_response] Got NewFactionFile")
+                fileMessage = json.loads(message.body)
+                print("[AMPQSTORM:_on_response] Emitting: " + message.body)
+                self.socketio.emit('newFile', fileMessage)
 
             elif message.properties['message_type'] == 'NewTransport':
                 print("[AMPQSTORM:_on_response] Got PayloadUpdate")

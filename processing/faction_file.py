@@ -124,7 +124,11 @@ def new_faction_file(filename, filecontent, user_id=None, agent_id=None, hash=No
         print("[new_faction_file] UserId: {0}".format(faction_file.UserId))
         db.session.add(faction_file)
         db.session.commit()
-        rpc_client.send_request('FactionFileUpdate', faction_file_json(faction_file))
+        message = dict({
+            'Success': True,
+            'Result': faction_file_json(faction_file)
+        })
+        rpc_client.socketio.emit('newFile', message)
         return faction_file
     except Exception as e:
         error_message = str(e)
