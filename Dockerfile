@@ -26,5 +26,6 @@ CMD ["/usr/bin/gunicorn", \
   "--worker-class", "eventlet", \
   "--workers", "1", \
   "--log-config", "/app/logging.conf", \
+  "--timeout", "300", \
   "--bind", "0.0.0.0:5000", \
   "app:app" ]
