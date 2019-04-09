@@ -8,6 +8,10 @@ payload_parser.add_argument('Description')
 payload_parser.add_argument('AgentType')
 payload_parser.add_argument('AgentTypeFormat')
 payload_parser.add_argument('TransportId', type=int)
+payload_parser.add_argument('Architecture')
+payload_parser.add_argument('Version')
+payload_parser.add_argument('Format')
+payload_parser.add_argument('AgentTypeConfiguration')
 payload_parser.add_argument('Jitter', type=float)
 payload_parser.add_argument('BeaconInterval', type=int)
 payload_parser.add_argument('ExpirationDate')
@@ -23,13 +27,18 @@ class PayloadEndpoint(Resource):
     def post(self):
         args = payload_parser.parse_args()
         return jsonify(payload.new_payload(description=args['Description'],
-                                               agent_type=args['AgentType'],
-                                               agent_type_format=args['AgentTypeFormat'],
-                                               agent_transport_id=args['AgentTransportId'],
-                                               transport_id=args['TransportId'],
-                                               jitter=args['Jitter'],
-                                               interval=args['BeaconInterval'],
-                                               expiration_date=args['ExpirationDate']))
+                                           agent_type=args['AgentType'],
+                                           agent_type_format=args['AgentTypeFormat'],
+                                           agent_transport_id=args['AgentTransportId'],
+                                           transport_id=args['TransportId'],
+                                           operating_system=args['OperatingSystem'],
+                                           architecture=args['Architecture'],
+                                           version=args['Version'],
+                                           format=args['Format'],
+                                           agent_type_configuration=args['AgentTypeConfiguration'],
+                                           jitter=args['Jitter'],
+                                           interval=args['BeaconInterval'],
+                                           expiration_date=args['ExpirationDate']))
 
     @authorized_groups(['StandardWrite'])
     def put(self, payload_id):

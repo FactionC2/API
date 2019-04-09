@@ -91,7 +91,19 @@ def get_payload(payload_id, include_hidden=False):
     })
 
 
-def new_payload(description, agent_type, agent_type_format, transport_id, agent_transport_id, jitter, interval, expiration_date=None):
+def new_payload(description,
+                agent_type,
+                agent_type_format,
+                transport_id,
+                agent_transport_id,
+                operating_system,
+                architecture,
+                version,
+                format,
+                agent_type_configuration,
+                jitter,
+                interval,
+                expiration_date=None):
 
     print("[payload:new_payload] Got request")
     print("Jitter: {0}, Interval: {1}, AgentType: {2}, ExpirationDate: {3}".format(jitter, interval, agent_type, expiration_date))
@@ -148,6 +160,11 @@ def new_payload(description, agent_type, agent_type_format, transport_id, agent_
         "AgentTypeFormatId": agent_type_format,
         "AgentTransportTypeId": agent_transport_id,
         "TransportId": transport_id,
+        "OperatingSystem": operating_system,
+        "Architecture": architecture,
+        "Version": version,
+        "Format": format,
+        "AgentTypeConfiguration": agent_type_configuration,
         "Jitter": "{0:0.1f}".format(jitter_float),
         "BeaconInterval": interval,
         "ExpirationDate": expiration_date

@@ -16,6 +16,11 @@ class Payload(db.Model):
     AgentTransportTypeId = db.Column(db.Integer, db.ForeignKey('AgentTransportType.Id'), nullable=False)
     TransportId = db.Column(db.Integer, db.ForeignKey('Transport.Id'), nullable=False)
 
+    Architecture = db.Column(db.Boolean)
+    Version = db.Column(db.String)
+    Format = db.Column(db.String)
+    AgentTypeConfiguration = db.Column(db.String)
+
     BeaconInterval = db.Column(db.Integer)
     Jitter = db.Column(db.Float)
     Created = db.Column(db.DateTime)

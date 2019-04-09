@@ -1,17 +1,17 @@
 from backend.database import db
 
 
-class AgentTypeFormat(db.Model):
-    __tablename__ = "AgentTypeFormat"
+class AgentTypeArchitecture(db.Model):
+    __tablename__ = "AgentTypeArchitecture"
     Id = db.Column(db.Integer, primary_key=True)
     Name = db.Column(db.String)
     AgentTypeId = db.Column(db.Integer, db.ForeignKey('AgentType.Id'), nullable=False)
 
     def __repr__(self):
         if self.Name:
-            return '<AgentTypeFormat: %s>' % self.Name
+            return '<AgentTypeArchitecture: %s>' % self.Name
         else:
-            return '<AgentTypeFormat: %s>' % str(self.Id)
+            return '<AgentTypeArchitecture: %s>' % str(self.Id)
 
 
 

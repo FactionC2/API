@@ -132,6 +132,11 @@ def new_payload(data):
                                agent_type_format = data.get('AgentTypeFormat'),
                                agent_transport_id = data.get('AgentTransportId'),
                                transport_id=data.get('TransportId'),
+                               operating_system=data.get('OperatingSystem'),
+                               architecture=data.get('Architecture'),
+                               version=data.get('Version'),
+                               format=data.get('Format'),
+                               agent_type_configuration=data.get('AgentTypeConfiguration'),
                                jitter = data.get('Jitter'),
                                interval = data.get('BeaconInterval'),
                                expiration_date = data.get('ExpirationDate'))
