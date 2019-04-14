@@ -56,7 +56,7 @@ def agent_type_json(agent_type):
         associated_transports = Transport.query.filter_by(Guid=transport.TransportTypeGuid)
 
         for associated_transport in associated_transports:
-            if associated_transport.Visable:
+            if associated_transport.Visible:
                 available_transports.append({
                     "Id": associated_transport.Id,
                     "AgentTransportName": transport.Name,
