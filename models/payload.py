@@ -12,14 +12,13 @@ class Payload(db.Model):
     Filename = db.Column(db.String)
 
     AgentTypeId = db.Column(db.Integer, db.ForeignKey('AgentType.Id'), nullable=False)
+    AgentTypeArchitectureId = db.Column(db.Integer, db.ForeignKey('AgentTypeArchitecture.Id'), nullable=False)
+    AgentTypeConfigurationId = db.Column(db.Integer, db.ForeignKey('AgentTypeConfiguration.Id'), nullable=False)
+    AgentTypeOperatingSystemId = db.Column(db.Integer, db.ForeignKey('AgentTypeOperatingSystem.Id'), nullable=False)
+    AgentTypeVersionId = db.Column(db.Integer, db.ForeignKey('AgentTypeVersion.Id'), nullable=False)
     AgentTypeFormatId = db.Column(db.Integer, db.ForeignKey('AgentTypeFormat.Id'), nullable=False)
     AgentTransportTypeId = db.Column(db.Integer, db.ForeignKey('AgentTransportType.Id'), nullable=False)
     TransportId = db.Column(db.Integer, db.ForeignKey('Transport.Id'), nullable=False)
-
-    Architecture = db.Column(db.Boolean)
-    Version = db.Column(db.String)
-    Format = db.Column(db.String)
-    AgentTypeConfiguration = db.Column(db.String)
 
     BeaconInterval = db.Column(db.Integer)
     Jitter = db.Column(db.Float)

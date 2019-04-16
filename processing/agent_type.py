@@ -31,14 +31,14 @@ def agent_type_json(agent_type):
         }
         formats.append(result)
 
-    for operating_system in agent_type.OperatingSystems:
+    for operating_system in agent_type.AgentTypeOperatingSystems:
         result = {
             "Id": operating_system.Id,
             "Name": operating_system.Name,
         }
         operating_systems.append(result)
 
-    for version in agent_type.Versions:
+    for version in agent_type.AgentTypeVersions:
         result = {
             "Id": version.Id,
             "Name": version.Name,
