@@ -17,6 +17,7 @@ class AgentType(db.Model):
     AgentTypeFormats = db.relationship('AgentTypeFormat', backref='AgentType', lazy=True)
     AgentTypeOperatingSystems = db.relationship('AgentTypeOperatingSystem', backref='AgentType', lazy=True)
     AgentTypeVersions = db.relationship('AgentTypeVersion', backref='AgentType', lazy=True)
+    Payloads = db.relationship('Payload', backref='AgentType', lazy=True)
     Name = db.Column(db.String)
     Guid = db.Column(db.String)
 

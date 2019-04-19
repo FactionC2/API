@@ -6,6 +6,7 @@ class AgentTypeVersion(db.Model):
     Id = db.Column(db.Integer, primary_key=True)
     Name = db.Column(db.String)
     AgentTypeId = db.Column(db.Integer, db.ForeignKey('AgentType.Id'), nullable=False)
+    Payloads = db.relationship('Payload', backref='AgentTypeVersion', lazy=True)
 
     def __repr__(self):
         if self.Name:

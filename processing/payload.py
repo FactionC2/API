@@ -36,8 +36,7 @@ def payload_json(payload):
 
     agentTypeFormat = dict({
         'Id': payload.AgentTypeFormat.Id,
-        'Name': payload.AgentTypeFormat.Name,
-        'Description': payload.AgentTypeFormat.Description
+        'Name': payload.AgentTypeFormat.Name
     })
 
     agentTransport = dict({
