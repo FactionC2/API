@@ -138,7 +138,8 @@ def new_payload(data):
                                agent_type_configuration=data.get('AgentTypeConfigurationId'),
                                jitter = data.get('Jitter'),
                                interval = data.get('BeaconInterval'),
-                               expiration_date = data.get('ExpirationDate'))
+                               expiration_date = data.get('ExpirationDate'),
+                               debug=data.get('Debug'))
     emit('newPayload', resp, broadcast=True)
 
 

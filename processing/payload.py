@@ -101,6 +101,7 @@ def new_payload(description,
                 agent_type_configuration,
                 jitter,
                 interval,
+                debug,
                 expiration_date=None):
 
     print("[payload:new_payload] Got request")
@@ -164,7 +165,8 @@ def new_payload(description,
         "AgentTypeConfigurationId": agent_type_configuration,
         "Jitter": "{0:0.1f}".format(jitter_float),
         "BeaconInterval": interval,
-        "ExpirationDate": expiration_date
+        "ExpirationDate": expiration_date,
+        "Debug": debug
     })
 
     print("[payload:new_payload] Publishing: {0}".format(publish_message))
