@@ -22,6 +22,7 @@ class Agent(db.Model):
     AgentTypeId = db.Column(db.Integer, db.ForeignKey('AgentType.Id'), nullable=False)
     StagingResponseId = db.Column(db.Integer, db.ForeignKey('StagingMessage.Id'), nullable=False)
     PayloadId = db.Column(db.Integer, db.ForeignKey('Payload.Id'), nullable=False)
+    TransportId = db.Column(db.Integer, db.ForeignKey('Transport.Id'), nullable=False)
     InternalIP = db.Column(db.String)
     ExternalIP = db.Column(db.String)
     InitialCheckin = db.Column(db.DateTime)
@@ -30,7 +31,7 @@ class Agent(db.Model):
     Jitter = db.Column(db.Float)
     Tasks = db.relationship('AgentTask', backref='Agent', lazy=True)
     ConsoleMessages = db.relationship("ConsoleMessage", backref='Agent', lazy=True)
-    Transports = db.relationship('Transport', secondary=AgentsTransportsXREF, lazy='subquery', backref=db.backref('Agents', lazy=True))
+    AvailableTransports = db.relationship('Transport', secondary=AgentsTransportsXREF, lazy='subquery', backref=db.backref('AvailableAgents', lazy=True))
     Visible = db.Column(db.Boolean)
 
     def __repr__(self):

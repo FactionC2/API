@@ -34,6 +34,21 @@ def payload_json(payload):
         'Name': payload.AgentType.Name
     })
 
+    operating_system = dict({
+        'Id': payload.AgentTypeOperatingSystem.Id,
+        'Name': payload.AgentTypeOperatingSystem.Name
+    })
+
+    architecture = dict({
+        'Id': payload.AgentTypeArchitecture.Id,
+        'Name': payload.AgentTypeArchitecture.Name
+    })
+
+    configuration = dict({
+        'Id': payload.AgentTypeConfiguration.Id,
+        'Name': payload.AgentTypeConfiguration.Name
+    })
+
     agentTypeFormat = dict({
         'Id': payload.AgentTypeFormat.Id,
         'Name': payload.AgentTypeFormat.Name
@@ -47,7 +62,7 @@ def payload_json(payload):
     transport = dict({
         'Id': payload.Transport.Id,
         'Name': payload.Transport.Name,
-        'Description': payload.Transport.Description
+        'TransportType': payload.Transport.TransportType
     })
 
     result = {
@@ -56,6 +71,9 @@ def payload_json(payload):
         'Description': payload.Description,
         'Key': payload.Key,
         'AgentType': agentType,
+        'Configuration': configuration,
+        'Architecture': architecture,
+        'OperatingSystem': operating_system,
         'Format': agentTypeFormat,
         'AgentTransport': agentTransport,
         'Transport': transport,

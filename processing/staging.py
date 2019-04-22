@@ -1,6 +1,6 @@
 from base64 import b64encode, b64decode
 from time import sleep
-from flask import json
+from flask import json, request
 
 from models.agent import Agent
 from models.staging_message import StagingMessage
@@ -62,7 +62,7 @@ def get_staging_response(staging_id):
     })
 
 
-def new_staging_message(payload_name, staging_id, message):
+def new_staging_message(payload_name, staging_id, transport_id, message, source_ip=None):
     print("[staging_message:new_staging_message] Got staging request. PayloadName: {0} ID: {1}".format(payload_name, staging_id))
 
     response = get_staging_response(staging_id)
@@ -72,6 +72,10 @@ def new_staging_message(payload_name, staging_id, message):
         decoded_response = b64decode(message)
         response_dict = json.loads(decoded_response)
         response_dict["PayloadName"] = payload_name
+        response_dict["TransportId"] = transport_id
+        if source_ip == None:
+            source_ip = request.remote_addr
+        response_dict["SourceIp"] = source_ip
 
 
     print("[staging_message:new_staging_message] Publishing: {0}".format(response_dict))

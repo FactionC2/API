@@ -191,7 +191,7 @@ def get_transport(data):
 @authorized_groups(['StandardWrite'])
 def new_transport(data):
     print('[socketio:new_transport] req received')
-    resp = transport.new_transport(description=data.get('Description'))
+    resp = transport.new_transport(name=data.get('Name'))
     emit('transportCreated', resp)
 
 @socketio.on('updateTransport')

@@ -63,7 +63,7 @@ def agent_type_json(agent_type):
                     "AgentTransportId": transport.Id,
                     "Name": associated_transport.Name,
                     "Guid": associated_transport.Guid,
-                    "Description": associated_transport.Description,
+                    "TransportType": associated_transport.TransportType,
                     "Enabled": associated_transport.Enabled
                 })
 

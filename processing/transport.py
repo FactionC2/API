@@ -28,14 +28,14 @@ def transport_json(transport):
         "Id": transport.Id,
         "Name": transport.Name,
         "Guid": transport.Guid,
-        "Description": transport.Description,
+        "TransportType": transport.TransportType,
         "ApiKeyId": transport.ApiKeyId,
         "ApiKeyName": apiKeyName,
         "Created": created,
         "LastCheckin": lastCheckin,
         "Enabled": transport.Enabled,
         "Visible": transport.Visible,
-        "Configuration": json.dumps(transport.Configuration)
+        "Configuration": transport.Configuration
     }
 
 
@@ -57,10 +57,10 @@ def get_transport(transport_id='all', include_hidden=False):
         "Results": results
     }
 
-def new_transport(description):
+def new_transport(name):
     apiKey = new_api_key('transport', 1, current_user.Id)
     publish_message = dict({
-        "Description": description,
+        "Name": name,
         "ApiKeyId": apiKey["Id"],
         "UserId": current_user.Id
     })
@@ -102,15 +102,15 @@ def new_transport(description):
         return create_error_message("Timeout waiting for response from Core while creating new transport. Resubmit your request.")
 
 
-def update_transport(transport_id, name=None, description=None, guid=None, configuration=None, enabled=None, visible=None):
+def update_transport(transport_id, name=None, transport_type=None, guid=None, configuration=None, enabled=None, visible=None):
     transport = Transport.query.get(transport_id)
 
     # Only update what we're given. Probably a better way to do this..
     if name is None:
         name = transport.Name
 
-    if description is None:
-        description = transport.Description
+    if transport_type is None:
+        transport_type = transport.TransportType
 
     if guid is None:
         guid = transport.Guid
@@ -127,7 +127,7 @@ def update_transport(transport_id, name=None, description=None, guid=None, confi
     publish_message = {
         "Id": transport.Id,
         "Name": name,
-        "Description": description,
+        "TransportType": transport_type,
         "Guid": guid,
         "Configuration": configuration,
         "Enabled": enabled,

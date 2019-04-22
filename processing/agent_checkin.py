@@ -1,7 +1,7 @@
 from base64 import b64decode
 from datetime import datetime
 
-from flask import json
+from flask import json, request
 from flask_socketio import SocketIO
 from backend.rabbitmq import rpc_client
 from models.agent import Agent
@@ -33,7 +33,7 @@ def get_agent_checkin(agent_checkin_id='all'):
     return result
 
 
-def add_agent_checkin(agent_name, message=None):
+def add_agent_checkin(agent_name, transport_id=None, source_ip=None, message=None):
     hmac = None
     iv = None
     msg = None
@@ -44,8 +44,16 @@ def add_agent_checkin(agent_name, message=None):
         iv = checkin_dict["IV"]
         msg = checkin_dict["Message"]
 
+    if not source_ip:
+        source_ip = request.remote_addr
+
+    if not transport_id:
+        transport_id = 1
+
     checkin = {
         'AgentName': agent_name,
+        'TransportId': transport_id,
+        'SourceIp': source_ip,
         'HMAC': hmac,
         'IV': iv,
         'Message': msg
@@ -61,6 +69,6 @@ def add_agent_checkin(agent_name, message=None):
     }
 
 
-def process_agent_checkin(agent_name, message=None):
-    result = add_agent_checkin(agent_name, message)
+def process_agent_checkin(agent_name, transport_id=None, source_ip=None, message=None):
+    result = add_agent_checkin(agent_name, transport_id, source_ip, message)
     return agent_task_message.get_unsent_agent_task_messages(agent_name)
