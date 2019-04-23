@@ -34,10 +34,24 @@ def payload_json(payload):
         'Name': payload.AgentType.Name
     })
 
+    operating_system = dict({
+        'Id': payload.AgentTypeOperatingSystem.Id,
+        'Name': payload.AgentTypeOperatingSystem.Name
+    })
+
+    architecture = dict({
+        'Id': payload.AgentTypeArchitecture.Id,
+        'Name': payload.AgentTypeArchitecture.Name
+    })
+
+    configuration = dict({
+        'Id': payload.AgentTypeConfiguration.Id,
+        'Name': payload.AgentTypeConfiguration.Name
+    })
+
     agentTypeFormat = dict({
         'Id': payload.AgentTypeFormat.Id,
-        'Name': payload.AgentTypeFormat.Name,
-        'Description': payload.AgentTypeFormat.Description
+        'Name': payload.AgentTypeFormat.Name
     })
 
     agentTransport = dict({
@@ -48,7 +62,7 @@ def payload_json(payload):
     transport = dict({
         'Id': payload.Transport.Id,
         'Name': payload.Transport.Name,
-        'Description': payload.Transport.Description
+        'TransportType': payload.Transport.TransportType
     })
 
     result = {
@@ -57,6 +71,9 @@ def payload_json(payload):
         'Description': payload.Description,
         'Key': payload.Key,
         'AgentType': agentType,
+        'Configuration': configuration,
+        'Architecture': architecture,
+        'OperatingSystem': operating_system,
         'Format': agentTypeFormat,
         'AgentTransport': agentTransport,
         'Transport': transport,
@@ -91,7 +108,19 @@ def get_payload(payload_id, include_hidden=False):
     })
 
 
-def new_payload(description, agent_type, agent_type_format, transport_id, agent_transport_id, jitter, interval, expiration_date=None):
+def new_payload(description,
+                agent_type,
+                transport_id,
+                agent_transport_id,
+                operating_system,
+                architecture,
+                version,
+                format,
+                agent_type_configuration,
+                jitter,
+                interval,
+                debug,
+                expiration_date=None):
 
     print("[payload:new_payload] Got request")
     print("Jitter: {0}, Interval: {1}, AgentType: {2}, ExpirationDate: {3}".format(jitter, interval, agent_type, expiration_date))
@@ -145,12 +174,17 @@ def new_payload(description, agent_type, agent_type_format, transport_id, agent_
         "Description": description,
         "BuildToken": build_token,
         "AgentTypeId": agent_type,
-        "AgentTypeFormatId": agent_type_format,
         "AgentTransportTypeId": agent_transport_id,
         "TransportId": transport_id,
+        "OperatingSystemId": operating_system,
+        "ArchitectureId": architecture,
+        "VersionId": version,
+        "FormatId": format,
+        "AgentTypeConfigurationId": agent_type_configuration,
         "Jitter": "{0:0.1f}".format(jitter_float),
         "BeaconInterval": interval,
-        "ExpirationDate": expiration_date
+        "ExpirationDate": expiration_date,
+        "Debug": debug
     })
 
     print("[payload:new_payload] Publishing: {0}".format(publish_message))

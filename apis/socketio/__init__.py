@@ -129,12 +129,17 @@ def new_payload(data):
 
     resp = payload.new_payload(description = data.get('Description'),
                                agent_type = data.get('AgentType'),
-                               agent_type_format = data.get('AgentTypeFormat'),
                                agent_transport_id = data.get('AgentTransportId'),
                                transport_id=data.get('TransportId'),
+                               operating_system=data.get('OperatingSystemId'),
+                               architecture=data.get('ArchitectureId'),
+                               version=data.get('VersionId'),
+                               format=data.get('FormatId'),
+                               agent_type_configuration=data.get('AgentTypeConfigurationId'),
                                jitter = data.get('Jitter'),
                                interval = data.get('BeaconInterval'),
-                               expiration_date = data.get('ExpirationDate'))
+                               expiration_date = data.get('ExpirationDate'),
+                               debug=data.get('Debug'))
     emit('newPayload', resp, broadcast=True)
 
 
@@ -186,7 +191,7 @@ def get_transport(data):
 @authorized_groups(['StandardWrite'])
 def new_transport(data):
     print('[socketio:new_transport] req received')
-    resp = transport.new_transport(description=data.get('Description'))
+    resp = transport.new_transport(name=data.get('Name'))
     emit('transportCreated', resp)
 
 @socketio.on('updateTransport')

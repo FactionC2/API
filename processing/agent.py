@@ -19,6 +19,12 @@ def agent_json(agent):
         "Name": agent.AgentType.Name
     })
 
+    transport = dict({
+        "Id": agent.Transport.Id,
+        "Name": agent.Transport.Name,
+        "TransportType": agent.Transport.TransportType
+    })
+
     result = {
         'Id': agent.Id,
         'Name': agent.Name,
@@ -26,6 +32,7 @@ def agent_json(agent):
         'Hostname': agent.Hostname,
         'Pid': agent.PID,
         'AgentType': agentType,
+        'Transport': transport,
         'Admin': agent.Admin,
         'OperatingSystem': agent.OperatingSystem,
         'InitialCheckin': agent.InitialCheckin.isoformat(),

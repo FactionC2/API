@@ -2,17 +2,48 @@ from models.agent_type import AgentType
 from models.transport import Transport
 
 def agent_type_json(agent_type):
+    architectures = []
+    configurations = []
     formats = []
+    operating_systems = []
+    versions = []
     agent_transports = []
     available_transports = []
+
+    for architecture in agent_type.AgentTypeArchitectures:
+        result = {
+            "Id": architecture.Id,
+            "Name": architecture.Name,
+        }
+        architectures.append(result)
+
+    for config in agent_type.AgentTypeConfigurations:
+        result = {
+            "Id": config.Id,
+            "Name": config.Name,
+        }
+        configurations.append(result)
 
     for format in agent_type.AgentTypeFormats:
         result = {
             "Id": format.Id,
             "Name": format.Name,
-            "Description": format.Description
         }
         formats.append(result)
+
+    for operating_system in agent_type.AgentTypeOperatingSystems:
+        result = {
+            "Id": operating_system.Id,
+            "Name": operating_system.Name,
+        }
+        operating_systems.append(result)
+
+    for version in agent_type.AgentTypeVersions:
+        result = {
+            "Id": version.Id,
+            "Name": version.Name,
+        }
+        versions.append(result)
 
     for transport in agent_type.AgentTransportTypes:
         result = {
@@ -25,14 +56,15 @@ def agent_type_json(agent_type):
         associated_transports = Transport.query.filter_by(Guid=transport.TransportTypeGuid)
 
         for associated_transport in associated_transports:
-            if associated_transport.Enabled:
+            if associated_transport.Visible:
                 available_transports.append({
                     "Id": associated_transport.Id,
                     "AgentTransportName": transport.Name,
                     "AgentTransportId": transport.Id,
                     "Name": associated_transport.Name,
                     "Guid": associated_transport.Guid,
-                    "Description": associated_transport.Description
+                    "TransportType": associated_transport.TransportType,
+                    "Enabled": associated_transport.Enabled
                 })
 
 
@@ -42,7 +74,11 @@ def agent_type_json(agent_type):
         "Name": agent_type.Name,
         "AgentTransports": agent_transports,
         "AvailableTransports": available_transports,
-        "Formats": formats
+        "Architectures": architectures,
+        "Configurations": configurations,
+        "Formats": formats,
+        "OperatingSystems": operating_systems,
+        "Versions": versions
     }
 
 
