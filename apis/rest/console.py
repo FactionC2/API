@@ -15,13 +15,6 @@ class ConsoleEndpoint(Resource):
         response = console_message.get_console_message(console_message_id)
         return jsonify(response)
 
-    @authorized_groups(['StandardWrite'])
-    def post(self):
-        args = console_parser.parse_args()
-        print('[ConsoleEndpoint] Got args: %s', args)
-        response = console_message.new_console_message(args.get("AgentId"), args.get("Content"))
-        return jsonify(response)
-
 
 class ConsoleAgentEndpoint(Resource):
     @authorized_groups(['StandardRead'])
@@ -29,6 +22,14 @@ class ConsoleAgentEndpoint(Resource):
         print('[ConsoleAgentEndpoint] Got request for agent_id: {0}'.format(agent_id))
         response = console_message.get_console_messages_by_agent(agent_id)
         return jsonify(response)
+
+    @authorized_groups(['StandardWrite'])
+    def post(self):
+        args = console_parser.parse_args()
+        print('[ConsoleEndpoint] Got args: %s', args)
+        response = console_message.new_console_message(args.get("AgentId"), args.get("Content"))
+        return jsonify(response)
+    
 
 class ConsoleTaskEndpoint(Resource):
     @authorized_groups(['StandardRead'])
