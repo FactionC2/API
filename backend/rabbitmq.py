@@ -67,7 +67,6 @@ class RpcClient(object):
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='AgentUpdated')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='ErrorMessageAnnouncement')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='NewFactionFile')
-        self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='NewTransport')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='PayloadUpdate')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='PayloadUpdated')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='TransportUpdated')
