@@ -33,7 +33,7 @@ from apis.rest.user import LoginEndpoint, ChangePasswordEndpoint, ApiKeyEndpoint
 from apis.socketio import socketio
 
 # Setting this to true weakens CORS. DO NOT LEAVE THIS SET TO TRUE IN PROD
-dev=True
+dev = True
 
 
 def create_app():
@@ -76,7 +76,6 @@ def create_app():
     api.add_resource(FactionFileDownloadEndpoint, '/file/<string:faction_file_name>/download/')
     api.add_resource(FactionFileBytesEndpoint, '/file/<string:faction_file_name>/bytes/')
 
-
     # Misc REST endpoints
     api.add_resource(ErrorMessageEndpoint, '/errors/', '/errors/<int:error_message_id>')
     api.add_resource(IOCEndpoint, '/ioc/', '/ioc/<int:ioc_id>/')
@@ -84,7 +83,6 @@ def create_app():
     api.add_resource(PayloadFileEndpoint, '/payload/<int:payload_id>/file/')
     api.add_resource(StagingEndpoint, '/staging/', '/staging/<string:payload_name>/<string:staging_id>/')
     api.add_resource(TransportEndpoint, '/transport/', '/transport/<int:transport_id>/')
-
 
     login_manager.init_app(app)
     socketio.init_app(app, host='0.0.0.0', manage_session=False, message_queue=RABBIT_URL, channel="ConsoleMessages")
@@ -96,22 +94,13 @@ def create_app():
 
 
 app = create_app()
-
-# Fixes an issue with QueuePool overflows.
-# At least this person says it does: https://stackoverflow.com/a/53715116
-# @app.teardown_request
-# def shutdown_db_session(exception=None):
-#     db.session.remove()
+print("[app.py] app created, continuing..")
 
 if not os.path.exists(UPLOAD_DIR):
     os.makedirs(UPLOAD_DIR)
 
-
-@app.route('/')
-def root():
-    return send_from_directory('client', 'index.html')
-
-
 if __name__ == '__main__':
     print("[app.py:main] main starting...")
     socketio.run(app, host='0.0.0.0', max_size=4192)
+else:
+    print("foo")

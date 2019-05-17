@@ -15,7 +15,6 @@ def transport_json(transport):
     print('[transport_json] got apiKey: {0}'.format(apiKey))
     apiKeyName = apiKey["Results"][0]["Name"]
 
-
     created = None
     if transport.Created:
         created = transport.Created.isoformat()
@@ -95,7 +94,8 @@ def new_transport(name):
             "ApiKey": {
                 "KeyName": apiKey["Name"],
                 "Secret": apiKey["Secret"],
-            }
+            },
+            "Transport": transport_json(transport)
         }
     else:
         print("[transport:new_transport] Timed out.")
