@@ -43,6 +43,7 @@ def agent_json(agent):
     }
     return result
 
+
 def get_agent(agent_id, include_hidden=False):
     print("[get_agent] got agent id " + str(agent_id))
     if agent_id == 'all':
