@@ -60,7 +60,7 @@ class RpcClient(object):
         # Create the APIService queue
         print('[AMPQSTORM:open] Creating queue: ' + self.rpc_queue)
         self.channel.queue.declare(self.rpc_queue, durable=True, exclusive=False, auto_delete=False, arguments=None)
-        self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='Agent')
+        self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='NewAgent')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='AgentTaskUpdate')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='AgentCheckinAnnouncement')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='ConsoleMessageAnnouncement')
@@ -111,8 +111,8 @@ class RpcClient(object):
                 print('[AMPQSTORM:_on_response] Got a response to one of our messages. Updating queue.')
                 self.queue[message.correlation_id] = message.body
 
-            elif message.properties['message_type'] == 'Agent':
-                print("[AMPQSTORM:_on_response] Got Agent at {0}".format(message.timestamp))
+            elif message.properties['message_type'] == 'NewAgent':
+                print("[AMPQSTORM:_on_response] Got NewAgent at {0}".format(message.timestamp))
                 agent = json.loads(message.body)
                 agent['Success'] = True
                 print("[AMPQSTORM:_on_response] Publishing message: {0}".format(str(agent)))
