@@ -4,12 +4,14 @@ FROM alpine:3.8
 RUN apk add --no-cache \
             python3 \
             py3-gunicorn \
-            py3-psycopg2 \
             python3-dev \
             g++ \
             make \
             libffi-dev \
-            libcap
+            libcap \
+            musl-dev \
+            gcc \
+            postgresql-dev
 ADD . /app
 WORKDIR /app
 COPY ./docker_build/logging.conf /app/logging.conf
