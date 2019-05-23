@@ -42,7 +42,7 @@ blinker = ">=1.4"
 Flask-Caching = "*"
 json-logging-py = "*"
 dateparser = "*"
-psycopg2-binary = "*"
+psycopg2 = "*"
 
 [requires]
 python_version = "3.6"
