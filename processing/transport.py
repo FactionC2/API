@@ -85,21 +85,22 @@ def new_transport(name):
             print("[transport:new_transport] Got response from Core: {0}".format(message))
             message_dict = json.loads(message)
 
-        if 'Transport' in message_dict.keys():
-            transport = Transport.query.get(message_dict['Transport']['Id'])
-            transport.ApiKeyId = apiKey["Id"]
-            db.session.add(transport)
-            db.session.commit()
-            rpc_client.socketio.emit("UpdateTransport", {"Success": True, "Transport": transport_json(transport)})
-            return {
-                "Success": True,
-                "TransportId": transport.Id,
-                "ApiKey": {
-                    "KeyName": apiKey["Name"],
-                    "Secret": apiKey["Secret"]
-                },
-                "Transport": transport_json(transport)
-            }
+            if 'Transport' in message_dict.keys():
+
+                transport = Transport.query.get(message_dict['Transport']['Id'])
+                transport.ApiKeyId = apiKey["Id"]
+                db.session.add(transport)
+                db.session.commit()
+                rpc_client.socketio.emit("UpdateTransport", {"Success": True, "Transport": transport_json(transport)})
+                return {
+                    "Success": True,
+                    "TransportId": transport.Id,
+                    "ApiKey": {
+                        "KeyName": apiKey["Name"],
+                        "Secret": apiKey["Secret"]
+                    },
+                    "Transport": transport_json(transport)
+                }
     print("[transport:new_transport] Timed out.")
     return create_error_message(
         "Timeout waiting for response from Core while creating new transport. Resubmit your request.")
@@ -150,17 +151,7 @@ def update_transport(transport_id, name=None, transport_type=None, guid=None, co
     message = rpc_client.queue[message_id]
 
     if message:
-        print("[transport:update_transport] Got response from Core: {0}".format(message))
-        message_dict = json.loads(message)
-        print("[transport:update_transport] Message Dictionary: {0}".format(message_dict))
-        transport_id = message_dict.get('Transport').get('Id')
-        print("[transport:update_transport] Transport Id from Core: {0}".format(transport_id))
-        sleep(5)
-        transport = Transport.query.get(transport_id)
-        return {
-            "Success": True,
-            "Transport": transport_json(transport)
-        }
+        return json.loads(message)
     else:
         print("[transport:update_transport] Timed out.")
         return create_error_message("Timeout waiting for response from Core while updating transport. Resubmit your request.")
