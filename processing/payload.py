@@ -15,11 +15,13 @@ from backend.rabbitmq import rpc_client
 
 from config import UPLOAD_DIR, SECRET_KEY
 from models.payload import Payload
+from logger import log
 
 payload_upload_dir = os.path.join(UPLOAD_DIR, 'payloads/')
 
+
 def payload_json(payload):
-    print("[payload_json] Working on %s" % payload)
+    log("payload_json", "Working on %s" % payload)
 
     lastDownloaded = None
     if payload.LastDownloaded:
@@ -86,11 +88,11 @@ def payload_json(payload):
         'Enabled': payload.Enabled,
         'Visible': payload.Visible
     }
-    print("[payload_json] returning {0}".format(result))
+    log("payload_json", "returning {0}".format(result))
     return result
 
 def get_payload(payload_id, include_hidden=False):
-    print("[get_payload] got payload id " + str(payload_id) + ", show hidden: " + str(include_hidden))
+    log("get_payload", "got payload id " + str(payload_id) + ", show hidden: " + str(include_hidden))
     if payload_id == 'all':
         if include_hidden:
             payloads = Payload.query.all()
@@ -122,7 +124,7 @@ def new_payload(description,
                 debug,
                 expiration_date=None):
 
-    print("[payload:new_payload] Got request")
+    log("payload:new_payload", "Got request")
     print("Jitter: {0}, Interval: {1}, AgentType: {2}, ExpirationDate: {3}".format(jitter, interval, agent_type, expiration_date))
 
     if expiration_date != None:
@@ -187,14 +189,14 @@ def new_payload(description,
         "Debug": debug
     })
 
-    print("[payload:new_payload] Publishing: {0}".format(publish_message))
+    log("payload:new_payload", "Publishing: {0}".format(publish_message))
     message_id = rpc_client.send_request("NewPayload", publish_message, callback=True)
 
     # Wait for our response
     # TODO: Add actual timeout here.
     i = 0
     while rpc_client.queue[message_id] is None and i < 15:
-        print("[payload:new_payload] Waiting for {0} seconds".format(15 - i))
+        log("payload:new_payload", "Waiting for {0} seconds".format(15 - i))
         sleep(1)
         i += 1
 
@@ -202,10 +204,10 @@ def new_payload(description,
     message = rpc_client.queue[message_id]
 
     if message:
-        print("[payload:new_payload] Got response from Build Server: {0}".format(message))
+        log("payload:new_payload", "Got response from Build Server: {0}".format(message))
         message_dict = json.loads(message)
         if message_dict.get('Source'):
-            print("[payload:new_payload] Its an error..")
+            log("payload:new_payload", "Its an error..")
             return message_dict
         else:
             payload = Payload.query.get(message_dict['Id'])
@@ -213,7 +215,7 @@ def new_payload(description,
                 "Success": True,
                 "Result": payload_json(payload)
             }
-    print("[payload:new_payload] Timed out.")
+    log("payload:new_payload", "Timed out.")
     return create_error_message("Timeout waiting for response from Core while processing new payload")
 
 
@@ -247,20 +249,20 @@ def update_payload(payload_id, enabled=None, jitter=None, interval=None, visible
 
 # PAYLOAD FILE STUFF #
 def upload_payload(payload_id, build_token):
-    print("[payload:upload_payload] Got id: {0} with token: {1}".format(str(payload_id), build_token))
+    log("payload:upload_payload", "Got id: {0} with token: {1}".format(str(payload_id), build_token))
     payload = Payload.query.get(payload_id)
     s = URLSafeSerializer(SECRET_KEY)
     token_value = s.loads(build_token)
-    print("[payload:upload_payload] token value: {0}".format(token_value))
+    log("payload:upload_payload", "token value: {0}".format(token_value))
     if payload.Filename == None and payload.Name == token_value:
-        print("[payload:upload_payload] filename is null and token matches")
+        log("payload:upload_payload", "filename is null and token matches")
         payload.Built = True
         file = request.files['file']
         payload.Filename = secure_filename(file.filename)
-        print("[payload:upload_payload] filename set to: {0}".format(payload.Filename))
+        log("payload:upload_payload", "filename set to: {0}".format(payload.Filename))
         try:
             savePath = os.path.join(payload_upload_dir, payload.Filename)
-            print("[payload:upload_payload] saving file to: {0}".format(savePath))
+            log("payload:upload_payload", "saving file to: {0}".format(savePath))
             file.save(savePath)
             db.session.add(payload)
             db.session.commit()
@@ -277,10 +279,10 @@ def upload_payload(payload_id, build_token):
                 'Message': 'File saved as {0}'.format(payload.Filename)
             })
         except Exception as e:
-            print("[payload:upload_payload] file save failed: {0}".format(str(e)))
+            log("payload:upload_payload", "file save failed: {0}".format(str(e)))
             return create_error_message('Failed to save file: {0}'.format(str(e)))
     else:
-        print("[payload:upload_payload] token check failed or payload already built")
+        log("payload:upload_payload", "token check failed or payload already built")
         return create_error_message('Payload token invalid or payload already built')
 
 
@@ -288,7 +290,7 @@ def download_payload(payload_id):
     payload = Payload.query.get(payload_id)
     if payload.Filename:
         path = os.path.join(payload_upload_dir, payload.Filename)
-        print("[payload:download_payload] returning path: {0}".format(path))
+        log("payload:download_payload", "returning path: {0}".format(path))
         payload.LastDownloaded = datetime.utcnow()
         db.session.add(payload)
         db.session.commit()

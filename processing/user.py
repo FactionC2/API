@@ -13,9 +13,11 @@ from models.api_key import ApiKey
 from processing.user_role import get_role_id, get_role_name
 from processing.api_key import new_api_key
 
+from logger import log
+
 
 def user_json(user):
-    print("[user_json] Working on user: {0}".format(user))
+    log("user_json", "Working on user: {0}".format(user))
     lastLogin = None
     if user.LastLogin:
         lastLogin = user.LastLogin.isoformat()
@@ -29,17 +31,17 @@ def user_json(user):
         'Enabled': user.Enabled,
         'Visible': user.Visible
     }
-    print("[user_json] returning: {0}".format(result))
+    log("user_json", "returning: {0}".format(result))
     return result
 
 
 def login_faction_user(username, password):
-    print("[login_faction_user] Checking " + username)
+    log("login_faction_user", "Checking " + username)
     user = User.query.filter(func.lower(User.Username) == func.lower(username)).first()
     print(user)
 
     if user:
-        print("[login_faction_user] Got user: " + user.Username)
+        log("login_faction_user", "Got user: " + user.Username)
         if bcrypt.checkpw(password.encode('utf-8'), user.Password) and user.Enabled:
             print('[login_faction_user] Login successful')
             # System user is treated a little special
@@ -68,7 +70,7 @@ def login_faction_user(username, password):
                 "AccessKeyId": token['Name'],
                 "AccessSecret": token['Secret']
             })
-    print("[login_faction_user] Username or password no good")
+    log("login_faction_user", "Username or password no good")
     return dict({
         "Success": False,
         "Message": 'Invalid Username or Password'
@@ -94,13 +96,13 @@ def get_user(user_id='all', include_hidden=False):
     users = []
     results = []
     if user_id == 'all':
-        print("[get_user] Getting all users")
+        log("get_user", "Getting all users")
         if include_hidden:
             users = User.query.all()
         else:
             users = User.query.filter_by(Visible=True)
     else:
-        print("[get_user] Getting user {0}".format(user_id))
+        log("get_user", "Getting user {0}".format(user_id))
         users.append(User.query.get(user_id))
     if users:
         for user in users:
@@ -125,7 +127,7 @@ def create_user(username, password, role_name):
     user.Enabled = True
     user.Visible = True
     print(user.RoleId)
-    print('Creating user %s with password hash \n%s' % (user.Username, user.Password))
+    print('Creating user %s ' % user.Username)
     db.session.add(user)
     db.session.commit()
     return dict({
@@ -163,7 +165,7 @@ def update_user(user_id, username=None, role_id=None, enabled=None, visible=None
 def update_password(user_id, new_password):
     user = User.query.get(user_id)
     if user:
-        print("[update_password] Got user: " + user.Username)
+        log("update_password", "Got user: " + user.Username)
         user.Password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
         db.session.add(user)
         db.session.commit()

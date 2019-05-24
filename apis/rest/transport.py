@@ -17,7 +17,7 @@ transport_parser.add_argument('Visible')
 class TransportEndpoint(Resource):
     @authorized_groups(['StandardRead'])
     def get(self, transport_id='all'):
-        print("[transportEndpoint]::get")
+        log("transportEndpoint", "::get")
         response = get_transport(transport_id)
         return jsonify(response)
 
@@ -30,7 +30,7 @@ class TransportEndpoint(Resource):
     @authorized_groups(['StandardWrite', 'Transport'])
     def put(self, transport_id):
         args = transport_parser.parse_args()
-        print("[transportEndpoint]::put got args: {0}".format(args))
+        log("transportEndpoint", "::put got args: {0}".format(args))
         response = update_transport(transport_id=transport_id,
                                     name=args['Name'],
                                     transport_type=args['TransportType'],
@@ -43,7 +43,7 @@ class TransportEndpoint(Resource):
     @authorized_groups(['StandardWrite', 'Transport'])
     def delete(self, transport_id):
         args = transport_parser.parse_args()
-        print("[transportEndpoint]::put got args: {0}".format(args))
+        log("transportEndpoint", "::put got args: {0}".format(args))
         response = update_transport(transport_id=transport_id,
                                     enabled=False,
                                     visible=False)

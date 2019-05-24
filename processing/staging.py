@@ -9,10 +9,10 @@ from models.staging_response import StagingResponse
 from processing.agent import get_agent
 
 from backend.rabbitmq import rpc_client
-
+from logger import log
 
 def staging_message_json(staging_message):
-    print("[staging_message_json] Working on %s" % staging_message)
+    log("staging_message_json", "Working on %s" % staging_message)
     tasks = []
     # if staging_message.tasks:
     #     for task in staging_message.tasks:
@@ -63,7 +63,7 @@ def get_staging_response(staging_id):
 
 
 def new_staging_message(payload_name, staging_id, transport_id, message, source_ip=None):
-    print("[staging_message:new_staging_message] Got staging request. PayloadName: {0} ID: {1}".format(payload_name, staging_id))
+    log("staging_message:new_staging_message", "Got staging request. PayloadName: {0} ID: {1}".format(payload_name, staging_id))
 
     response = get_staging_response(staging_id)
     if response['Success']:
@@ -78,14 +78,14 @@ def new_staging_message(payload_name, staging_id, transport_id, message, source_
         response_dict["SourceIp"] = source_ip
 
 
-    print("[staging_message:new_staging_message] Publishing: {0}".format(response_dict))
+    log("staging_message:new_staging_message", "Publishing: {0}".format(response_dict))
     message_id = rpc_client.send_request('NewStagingMessage', response_dict, callback=True)
 
     # Wait for our response
-    print("[staging_message:new_staging_message] Waiting for 10 seconds")
+    log("staging_message:new_staging_message", "Waiting for 10 seconds")
     i = 0
     while rpc_client.queue[message_id] is None and i < 10:
-        print("[staging_message:new_staging_message] Waiting for {0} seconds".format(10 - i))
+        log("staging_message:new_staging_message", "Waiting for {0} seconds".format(10 - i))
         sleep(1)
         i += 1
 
@@ -93,8 +93,8 @@ def new_staging_message(payload_name, staging_id, transport_id, message, source_
     message = rpc_client.queue[message_id]
 
     if message:
-        print("[staging_message] Got response from Core: {0}".format(message))
+        log("staging_message", "Got response from Core: {0}".format(message))
         return json.loads(message)
     else:
-        print("[staging_message] Timed out.")
+        log("staging_message", "Timed out.")
         return "ERROR"
