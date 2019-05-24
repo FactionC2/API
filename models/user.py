@@ -7,6 +7,7 @@ from flask import g
 from flask.sessions import SecureCookieSessionInterface
 from flask_login import user_loaded_from_header, user_loaded_from_request
 
+from logger import log
 from backend.database import db
 from backend.cache import cache
 from flask import jsonify
@@ -50,17 +51,17 @@ class User(db.Model):
         return False
 
     def change_password(self, current_password, new_password):
-        print("[change_password] Got password change request")
+        log("change_password", "Got password change request")
         if bcrypt.checkpw(current_password.encode('utf-8'), self.Password) and self.Enabled:
             self.Password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
             db.session.add(self)
             db.session.commit()
-            print("[change_password] Password changed")
+            log("change_password", "Password changed")
             return dict({
                 "Success": True,
                 "Message": 'Changed password for user: {0}'.format(self.Username)
             })
-        print("[change_password] Current password incorrect")
+        log("change_password", "Current password incorrect")
         return {
             'Success':False,
             'Message':'Invalid username or password.'
@@ -68,7 +69,7 @@ class User(db.Model):
 
     def get_api_keys(self):
         api_keys = self.ApiKeys
-        print("[get_api_keys] Got api keys: {0}".format(str(api_keys)))
+        log("get_api_keys", "Got api keys: {0}".format(str(api_keys)))
         results = []
         for api_key in api_keys:
             result = dict()
@@ -118,7 +119,7 @@ class ApiSessionInterface(SecureCookieSessionInterface):
         return False
 
     def save_session(self, *args, **kwargs):
-        print("[user model] save session called")
+        log("user model", "save session called")
         return
 
 @login_manager.user_loader
@@ -128,7 +129,7 @@ def user_loader(user_id):
     :param unicode user_id: user_id (email) user to retrieve
 
     """
-    print("[user_loader] Called for user_id: {0}".format(user_id))
+    log("user_loader", "Called for user_id: {0}".format(user_id))
     """Load user by ID from cache, if not in cache, then cache it."""
     # make a unique cache key for each user
     user_key = 'user_{}'.format(user_id)
@@ -149,12 +150,12 @@ def user_loader(user_id):
 
 @user_loaded_from_header.connect
 def user_loaded_from_header(self, user=None):
-    print("[user model] User loaded from header")
+    log("user model", "User loaded from header")
     g.login_via_header = True
 
 @user_loaded_from_request.connect
 def user_loaded_from_request(self, user=None):
-    print("[user model] User loaded from request")
+    log("user model", "User loaded from request")
     g.login_via_request = True
 
 @login_manager.request_loader
@@ -182,7 +183,7 @@ def load_user_from_request(request):
     except:
         pass
     if secret and keyid:
-        print('Got API KEY: {0}'.format(keyid + ':' + secret))
+        print('Got API KEY: {0}'.format(keyid))
         apiKey = ApiKey.query.filter_by(Name=keyid).first()
         if apiKey and apiKey.Enabled:
             if bcrypt.checkpw(secret.encode('utf-8'), apiKey.Key):

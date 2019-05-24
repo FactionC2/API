@@ -2,6 +2,8 @@ from flask import jsonify, request, send_file
 from flask_restful import Resource, reqparse
 from processing import payload
 from processing.user_role import authorized_groups
+from logger import log
+
 
 payload_parser = reqparse.RequestParser()
 payload_parser.add_argument('Description')
@@ -68,7 +70,7 @@ class PayloadFileEndpoint(Resource):
     def get(self, payload_id):
         result = payload.download_payload(payload_id)
         if result['Success']:
-            print("[rest/payloadfile:get] sending {0}".format(result['Message']))
+            log("rest/payloadfile:get]", "sending {0}".format(result['Message']))
             return send_file(result['Message'], as_attachment=True, attachment_filename=result['Filename'])
         else:
             return jsonify({

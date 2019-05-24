@@ -60,7 +60,7 @@ class LogoutEndpoint(Resource):
 class ChangePasswordEndpoint(Resource):
     @authorized_groups(['StandardRead'])
     def post(self, user_id=None):
-        print("[ChangePasswordEndpoint] Got request from user: {0}".format(user_id))
+        log("ChangePasswordEndpoint", "Got request from user: {0}".format(user_id))
         args = change_password_parser.parse_args()
         return jsonify(current_user.change_password(args['CurrentPassword'], args['NewPassword']))
 
@@ -111,7 +111,7 @@ class UserEndpoint(Resource):
     @authorized_groups(["Admin"])
     def post(self):
         args = user_parser.parse_args()
-        print("[UserEndpoint:Post] got args: {0}".format(args))
+        log("UserEndpoint:Post", "got args: {0}".format(args))
         return jsonify(user.create_user(args['Username'], args['Password'], args['RoleName']))
 
     @authorized_groups(["Admin"])
