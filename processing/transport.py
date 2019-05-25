@@ -2,7 +2,7 @@ import json
 from time import sleep
 from flask_login import current_user
 from backend.database import db
-from backend.rabbitmq import rpc_client
+from backend.rabbitmq import rabbit_producer
 
 from models.transport import Transport
 from processing.api_key import new_api_key, get_api_key
@@ -67,19 +67,19 @@ def new_transport(name):
     })
 
     print("[transport:new_transport] Publishing: {0}".format(publish_message))
-    message_id = rpc_client.send_request("NewTransport", publish_message, callback=True)
+    message_id = rabbit_producer.send_request("NewTransport", publish_message, callback=True)
 
     # Wait for our response
     # TODO: Add actual timeout here.
     i = 0
-    while i < 10:
+    while i < 20:
         print("[transport:new_transport] Waiting for {0} seconds".format(9999 - i))
         sleep(1)
         i += 1
         print(i)
 
         # Return data
-        message = rpc_client.queue[message_id]
+        message = rabbit_producer.queue[message_id]
 
         if message:
             print("[transport:new_transport] Got response from Core: {0}".format(message))
@@ -91,7 +91,7 @@ def new_transport(name):
                 transport.ApiKeyId = apiKey["Id"]
                 db.session.add(transport)
                 db.session.commit()
-                rpc_client.socketio.emit("UpdateTransport", {"Success": True, "Transport": transport_json(transport)})
+                rabbit_producer.socketio.emit("UpdateTransport", {"Success": True, "Transport": transport_json(transport)})
                 return {
                     "Success": True,
                     "TransportId": transport.Id,
@@ -138,17 +138,17 @@ def update_transport(transport_id, name=None, transport_type=None, guid=None, co
         "Visible": visible
     }
 
-    message_id = rpc_client.send_request("UpdateTransport", publish_message, callback=True)
+    message_id = rabbit_producer.send_request("UpdateTransport", publish_message, callback=True)
     # Wait for our response
     # TODO: Add actual timeout here.
     i = 0
-    while rpc_client.queue[message_id] is None and i < 15:
+    while rabbit_producer.queue[message_id] is None and i < 15:
         print("[transport:new_transport] Waiting for {0} seconds".format(15 - i))
         sleep(1)
         i += 1
 
     # Return data
-    message = rpc_client.queue[message_id]
+    message = rabbit_producer.queue[message_id]
 
     if message:
         return json.loads(message)

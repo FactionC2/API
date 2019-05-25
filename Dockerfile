@@ -4,12 +4,14 @@ FROM alpine:3.8
 RUN apk add --no-cache \
             python3 \
             py3-gunicorn \
-            py3-psycopg2 \
             python3-dev \
             g++ \
             make \
             libffi-dev \
-            libcap
+            libcap \
+            postgresql-dev \
+            gcc \
+            musl-dev
 ADD . /app
 WORKDIR /app
 COPY ./docker_build/logging.conf /app/logging.conf
@@ -21,6 +23,7 @@ RUN addgroup -S -g 1337 gunicorn && \
     mkdir -p ./cache && \
     chown gunicorn:gunicorn ./cache
 EXPOSE 5000
+
 USER gunicorn
 CMD ["/usr/bin/gunicorn", \
   "--worker-class", "eventlet", \

@@ -2,7 +2,7 @@ from datetime import datetime
 
 from flask import json
 from flask_socketio import SocketIO
-from backend.rabbitmq import rpc_client
+from backend.rabbitmq import rabbit_producer
 
 from models.agent import Agent
 from models.ioc import IOC

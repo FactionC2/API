@@ -1,9 +1,5 @@
-from flask import json
-
 from models.agent import Agent
-from models.staging_message import StagingMessage
-from backend.database import db
-from backend.rabbitmq import rpc_client
+from backend.rabbitmq import rabbit_producer
 
 
 def agent_json(agent):
@@ -74,5 +70,5 @@ def update_agent(agent_id, agent_name=None, visible=None):
         "Visible": agent.Visible
     })
     print("[update_agent] sending message: {0}".format(message))
-    rpc_client.send_request("UpdateAgent", message)
+    rabbit_producer.send_request("UpdateAgent", message)
     return {"Success": True, "Result": agent_json(agent)}

@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 from processing.error_message import create_error_message
 
 from backend.database import db
-from backend.rabbitmq import rpc_client
+from backend.rabbitmq import rabbit_producer
 
 from config import UPLOAD_DIR, SECRET_KEY
 from models.payload import Payload
@@ -188,18 +188,18 @@ def new_payload(description,
     })
 
     print("[payload:new_payload] Publishing: {0}".format(publish_message))
-    message_id = rpc_client.send_request("NewPayload", publish_message, callback=True)
+    message_id = rabbit_producer.send_request("NewPayload", publish_message, callback=True)
 
     # Wait for our response
     # TODO: Add actual timeout here.
     i = 0
-    while rpc_client.queue[message_id] is None and i < 15:
+    while rabbit_producer.queue[message_id] is None and i < 15:
         print("[payload:new_payload] Waiting for {0} seconds".format(15 - i))
         sleep(1)
         i += 1
 
     # Return data
-    message = rpc_client.queue[message_id]
+    message = rabbit_producer.queue[message_id]
 
     if message:
         print("[payload:new_payload] Got response from Build Server: {0}".format(message))
@@ -241,7 +241,7 @@ def update_payload(payload_id, enabled=None, jitter=None, interval=None, visible
     })
 
     print("Sending: {0}".format(message))
-    rpc_client.send_request("UpdatePayload", message)
+    rabbit_producer.send_request("UpdatePayload", message)
     return dict({"Success": True, "Payload": payload_json(payload)})
 
 
@@ -270,7 +270,7 @@ def upload_payload(payload_id, build_token):
                 "Payload": payload_json(payload)
             })
 
-            rpc_client.send_request('PayloadUpdated', payload_message)
+            rabbit_producer.send_request('PayloadUpdated', payload_message)
 
             return dict({
                 'Success': True,

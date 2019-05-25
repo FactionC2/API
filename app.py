@@ -1,15 +1,13 @@
 import os
 import secrets
-import psycopg2
-from time import sleep
 
-from flask import Flask, send_from_directory
+from flask import Flask
 from flask_restful import Api
 from flask_cors import CORS
 import eventlet
-import pika
 
-from config import SECRET_KEY, DB_URI, RABBIT_URL, UPLOAD_DIR
+from config import SECRET_KEY, DB_URI, RABBIT_URL, RABBIT_HOST, RABBIT_USERNAME, RABBIT_PASSWORD, UPLOAD_DIR
+
 from backend.database import db
 from backend.cache import cache
 
@@ -31,6 +29,7 @@ from apis.rest.user import LoginEndpoint, ChangePasswordEndpoint, ApiKeyEndpoint
     UserRoleEndpoint
 
 from apis.socketio import socketio
+from backend.rabbitmq import Consumer
 
 # Setting this to true weakens CORS. DO NOT LEAVE THIS SET TO TRUE IN PROD
 dev = True
@@ -94,13 +93,16 @@ def create_app():
 
 
 app = create_app()
+consumer = Consumer(RABBIT_HOST, RABBIT_USERNAME, RABBIT_PASSWORD, 'ApiService', socketio)
 print("[app.py] app created, continuing..")
 
 if not os.path.exists(UPLOAD_DIR):
     os.makedirs(UPLOAD_DIR)
 
+
 if __name__ == '__main__':
     print("[app.py:main] main starting...")
+    socketio.start_background_task(target=consumer.process_data_events)
     socketio.run(app, host='0.0.0.0', max_size=4192)
 else:
     print("foo")
