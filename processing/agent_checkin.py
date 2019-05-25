@@ -8,8 +8,10 @@ from models.agent import Agent
 from models.agent_checkin import AgentCheckin
 from models.agent_task_update import AgentTaskUpdate
 from processing import agent_task_message
+from logger import log
 
 socketio = SocketIO()
+
 
 def agent_checkin_json(agent_checkin):
     result = dict(
@@ -60,7 +62,7 @@ def add_agent_checkin(agent_name, transport_id=None, source_ip=None, message=Non
     }
 
 
-    print("[add_agent_task_response] publishing?")
+    log("add_agent_task_response", "publishing?")
     #publish_message('Core', 'AgentCheckin', json_string)
     rabbit_producer.send_request('NewAgentCheckin', checkin)
     return {

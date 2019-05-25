@@ -2,6 +2,7 @@ import functools
 from flask_login import current_user
 from backend.database import db
 from models.user_role import UserRole
+from logger import log
 
 standard_read = [
     'Admin',
@@ -53,15 +54,15 @@ def authorized_groups(groups):
 
             # Iterate through valid groups, checking if the user is in there.
             for group in groups:
-                print("[User Role - Authorized Groups] checking group: {0}".format(group))
+                log("User Role - Authorized Groups", "checking group: {0}".format(group))
                 group_id = get_role_id(group)
-                print("[User Role - Authorized Groups] group id: {0}".format(group_id))
+                log("User Role - Authorized Groups", "group id: {0}".format(group_id))
                 if current_user.RoleId == group_id:
                     print('[User Role - Authorized Groups] Authorized.')
                     authorized = True
 
             if not authorized:
-                print("[authorized_groups] User {0} is not in the following groups: {1}".format(current_user.Username, groups))
+                log("authorized_groups", "User {0} is not in the following groups: {1}".format(current_user.Username, groups))
                 return {
                     "Success":False,
                     "Message":"User does not have permissions to perform this action"
@@ -84,7 +85,7 @@ def create_role(name):
 
 def get_role(role_id='all'):
     results = []
-    print("[get_role] Getting role for id: {0}".format(role_id))
+    log("get_role", "Getting role for id: {0}".format(role_id))
     if role_id == 'all':
         roles = UserRole.query.all()
     else:
@@ -98,21 +99,21 @@ def get_role(role_id='all'):
     })
 
 def get_role_id(name):
-    print("[get_role_id] Getting role {0}".format(name))
+    log("get_role_id", "Getting role {0}".format(name))
     role = UserRole.query.filter_by(Name=name.lower()).first()
     if role:
-        print("[get_role_id] Got role {0}".format(role.Id))
+        log("get_role_id", "Got role {0}".format(role.Id))
         return role.Id
     else:
-        print("[get_role_id] Role not found")
+        log("get_role_id", "Role not found")
         return None
 
 def get_role_name(role_id):
-    print("[get_role_name] Getting role name {0}".format(role_id))
+    log("get_role_name", "Getting role name {0}".format(role_id))
     role = UserRole.query.get(role_id)
     if role:
-        print("[get_role_name] Got role name {0}".format(role.Name))
+        log("get_role_name", "Got role name {0}".format(role.Name))
         return role.Name
     else:
-        print("[get_role_name] Role not found")
+        log("get_role_name", "Role not found")
         return None

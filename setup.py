@@ -13,32 +13,33 @@ from config import ADMIN_USERNAME, ADMIN_PASSWORD
 
 from backend.database import db
 from app import create_app
+from logger import log
 
 def setup():
-    print("[setup] running..")
+    log("setup", "running..")
     app = create_app()
     with app.app_context():
-        print("[setup] Creating Roles..")
+        log("setup", "Creating Roles..")
         create_role("System")
         create_role("Admin")
         create_role("Operator")
         create_role("ReadOnly")
 
 
-        print("[setup] Creating System user")
+        log("setup", "Creating System user")
         user = User.query.get(1)
         if user:
             update_user(1)
         create_user("system", secrets.token_urlsafe(64), "system")
 
-        print("[setup] Creating Admin user")
+        log("setup", "Creating Admin user")
         user = User.query.get(2)
         if user:
             update_user(2)
         create_user(ADMIN_USERNAME, ADMIN_PASSWORD, "admin")
 
 
-        print("[setup] Creating ApiKey for DIRECT Transport")
+        log("setup", "Creating ApiKey for DIRECT Transport")
         apiKey = ApiKey()
         apiKey.Type = 'Transport'
 
@@ -54,7 +55,7 @@ def setup():
         db.session.add(apiKey)
         db.session.commit()
 
-        print("[setup] Creating DIRECT Transport..")
+        log("setup", "Creating DIRECT Transport..")
         transport = Transport()
         transport.Name = 'DIRECT'
         transport.Description = 'DIRECT Transport'
@@ -68,5 +69,5 @@ def setup():
         db.session.commit()
 
 if __name__ == "__main__":
-    print("[main] running setup()")
+    log("main", "running setup()")
     setup()

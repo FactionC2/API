@@ -22,8 +22,8 @@ def connect_handler():
 @socketio.on('getAgent')
 @authorized_groups(['StandardRead'])
 def get_agent(data):
-    print("[socketio.py - get_agent] starting for {0}..".format(current_user.Username))
-    print("[socketio.py - get_agent] data: " + str(data))
+    log("socketio.py - get_agent", "starting for {0}..".format(current_user.Username))
+    log("socketio.py - get_agent", "data: " + str(data))
     try:
         agent_id = data['AgentId']
     except:
@@ -61,7 +61,7 @@ def join_agent(data):
 @socketio.on('newAgentMessage')
 @authorized_groups(['StandardWrite', 'Transport'])
 def new_agent_message(data):
-    print("[NewAgentMessage] Got: %s", str(data))
+    log("NewAgentMessage", "Got: %s", str(data))
     message = agent_checkin.add_agent_checkin(data["AgentId"], data["Message"])
     emit('newAgentMessage', message)
 

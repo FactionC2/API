@@ -22,7 +22,7 @@ from processing.error_message import create_error_message
 files_upload_dir = os.path.join(UPLOAD_DIR, 'files/')
 
 def faction_file_json(faction_file):
-    print("[agent_json] Working on %s" % faction_file)
+    log("agent_json", "Working on %s" % faction_file)
 
     last_downloaded = None
 
@@ -67,7 +67,7 @@ def hash_file(filepath):
     return sha1.hexdigest()
 
 def get_faction_file(faction_file_name='all'):
-    print("[get_faction_file] got faction file " + str(faction_file_name))
+    log("get_faction_file", "got faction file " + str(faction_file_name))
     result = []
     if faction_file_name == 'all':
         files = FactionFile.query.all()
@@ -82,7 +82,7 @@ def get_faction_file(faction_file_name='all'):
     })
 
 def new_faction_file(filename, filecontent, user_id=None, agent_id=None, hash=None):
-    print("[new_faction_file] working on {0}".format(filename))
+    log("new_faction_file", "working on {0}".format(filename))
     faction_file = FactionFile()
     faction_file.Created = datetime.utcnow()
     faction_file.Visible = True
@@ -91,21 +91,21 @@ def new_faction_file(filename, filecontent, user_id=None, agent_id=None, hash=No
     if faction_file.UserId == None:
         faction_file.UserId = 1
 
-    print("[new_faction_file] UserId: {0}".format(faction_file.UserId))
+    log("new_faction_file", "UserId: {0}".format(faction_file.UserId))
     if agent_id:
-        print("[new_faction_file] got agent id {0}".format(agent_id))
+        log("new_faction_file", "got agent id {0}".format(agent_id))
         agent = Agent.query.get(agent_id)
-        print("[new_faction_file] got agent {0}".format(agent.Name))
+        log("new_faction_file", "got agent {0}".format(agent.Name))
         faction_file.AgentId = agent.Id
-        print("[new_faction_file] set faction_file agent id to {0}".format(faction_file.AgentId))
+        log("new_faction_file", "set faction_file agent id to {0}".format(faction_file.AgentId))
         filename = "{0}_{1}_{2}".format(agent.Name, datetime.utcnow().strftime('%Y%m%d%H%M%S'), filename)
 
     faction_file.Name = secure_filename(filename)
 
-    print("[new_faction_file] filename set to: {0}".format(faction_file.Name))
+    log("new_faction_file", "filename set to: {0}".format(faction_file.Name))
     try:
         savePath = os.path.join(files_upload_dir, faction_file.Name)
-        print("[new_faction_file:upload_faction_file] saving file to: {0}".format(savePath))
+        log("new_faction_file:upload_faction_file", "saving file to: {0}".format(savePath))
         if hasattr(filecontent, 'save'):
             filecontent.save(savePath)
         else:
@@ -121,7 +121,7 @@ def new_faction_file(filename, filecontent, user_id=None, agent_id=None, hash=No
             else:
                 faction_file.HashMatch = False
 
-        print("[new_faction_file] UserId: {0}".format(faction_file.UserId))
+        log("new_faction_file", "UserId: {0}".format(faction_file.UserId))
         db.session.add(faction_file)
         db.session.commit()
         message = dict({
@@ -138,14 +138,14 @@ def new_faction_file(filename, filecontent, user_id=None, agent_id=None, hash=No
 def upload_faction_file(agent_name=None, hash=None, file_name=None, file_content=None):
     results = []
     error_message = None
-    print("[upload_faction_file] called..")
-    print("[upload_faction_file] Files in reqeust: {0}".format(request.files))
-    print("[upload_faction_file] Agent Name: {0}".format(agent_name))
-    print("[upload_faction_file] File Name: {0}".format(file_name))
-    print("[upload_faction_file] File Content: {0}".format(file_content))
+    log("upload_faction_file", "called..")
+    log("upload_faction_file", "Files in reqeust: {0}".format(request.files))
+    log("upload_faction_file", "Agent Name: {0}".format(agent_name))
+    log("upload_faction_file", "File Name: {0}".format(file_name))
+    log("upload_faction_file", "File Content: {0}".format(file_content))
 
     files = request.files.getlist("files")
-    print("[upload_faction_file] got files: {0}".format(files))
+    log("upload_faction_file", "got files: {0}".format(files))
     if agent_name:
         agent_id = Agent.query.filter_by(Name=agent_name).first().Id
     else:
@@ -174,10 +174,10 @@ def download_faction_file(faction_file_name):
     faction_file = FactionFile.query.filter_by(Name=faction_file_name).order_by(FactionFile.Id.desc()).first()
     print("UploadDir {0}".format(UPLOAD_DIR))
     print("FileUploadDir {0}".format(files_upload_dir))
-    print("[faction_file:download_faction_file] upload path: {0}".format(files_upload_dir))
+    log("faction_file:download_faction_file", "upload path: {0}".format(files_upload_dir))
     if faction_file.Name:
         path = os.path.join(files_upload_dir, faction_file.Name)
-        print("[faction_file:download_faction_file] returning path: {0}".format(path))
+        log("faction_file:download_faction_file", "returning path: {0}".format(path))
         faction_file.LastDownloaded = datetime.utcnow()
         db.session.add(faction_file)
         db.session.commit()

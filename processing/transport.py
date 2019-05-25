@@ -10,7 +10,7 @@ from processing.error_message import create_error_message
 
 def transport_json(transport):
     print('[transport_json] working on transport: {0}'.format(transport))
-    print('[transport_json] get_api_key with id: {0}'.format(transport.ApiKeyId))
+    print('[transport_json] getting api key with id: {0}'.format(transport.ApiKeyId))
     apiKey = get_api_key(transport.ApiKeyId)
     print('[transport_json] got apiKey: {0}'.format(apiKey))
     apiKeyName = apiKey["Results"][0]["Name"]
@@ -66,14 +66,24 @@ def new_transport(name):
         "UserId": current_user.Id
     })
 
+<<<<<<< HEAD
     print("[transport:new_transport] Publishing: {0}".format(publish_message))
     message_id = rabbit_producer.send_request("NewTransport", publish_message, callback=True)
+=======
+    log("transport:new_transport", "Publishing: {0}".format(publish_message))
+    message_id = rpc_client.send_request("NewTransport", publish_message, callback=True)
+>>>>>>> master
 
     # Wait for our response
     # TODO: Add actual timeout here.
     i = 0
+<<<<<<< HEAD
     while i < 20:
         print("[transport:new_transport] Waiting for {0} seconds".format(9999 - i))
+=======
+    while i < 10:
+        log("transport:new_transport", "Waiting for {0} seconds".format(9999 - i))
+>>>>>>> master
         sleep(1)
         i += 1
         print(i)
@@ -82,7 +92,7 @@ def new_transport(name):
         message = rabbit_producer.queue[message_id]
 
         if message:
-            print("[transport:new_transport] Got response from Core: {0}".format(message))
+            log("transport:new_transport", "Got response from Core: {0}".format(message))
             message_dict = json.loads(message)
 
             if 'Transport' in message_dict.keys():
@@ -101,7 +111,7 @@ def new_transport(name):
                     },
                     "Transport": transport_json(transport)
                 }
-    print("[transport:new_transport] Timed out.")
+    log("transport:new_transport", "Timed out.")
     return create_error_message(
         "Timeout waiting for response from Core while creating new transport. Resubmit your request.")
 
@@ -142,8 +152,13 @@ def update_transport(transport_id, name=None, transport_type=None, guid=None, co
     # Wait for our response
     # TODO: Add actual timeout here.
     i = 0
+<<<<<<< HEAD
     while rabbit_producer.queue[message_id] is None and i < 15:
         print("[transport:new_transport] Waiting for {0} seconds".format(15 - i))
+=======
+    while rpc_client.queue[message_id] is None and i < 15:
+        log("transport:new_transport", "Waiting for {0} seconds".format(15 - i))
+>>>>>>> master
         sleep(1)
         i += 1
 
@@ -153,5 +168,5 @@ def update_transport(transport_id, name=None, transport_type=None, guid=None, co
     if message:
         return json.loads(message)
     else:
-        print("[transport:update_transport] Timed out.")
+        log("transport:update_transport", "Timed out.")
         return create_error_message("Timeout waiting for response from Core while updating transport. Resubmit your request.")

@@ -3,13 +3,16 @@ from time import sleep
 import json
 import amqpstorm
 from amqpstorm import Message
-from config import RABBIT_HOST, RABBIT_USERNAME, RABBIT_PASSWORD
+from flask_socketio import SocketIO
+from config import RABBIT_HOST, RABBIT_URL, RABBIT_USERNAME, RABBIT_PASSWORD
+from logger import log
 
 
 class Consumer(object):
     """Asynchronous Rpc client."""
-    def __init__(self, host, username, password, rpc_queue, socketio):
-        print('[rabbitmq-consumer:open] Creating client..')
+
+    def __init__(self, host, username, password, rpc_queue):
+        log('AMPQSTORM:open', 'Creating client..')
         self.queue = {}
         self.host = host
         self.username = username
@@ -23,8 +26,8 @@ class Consumer(object):
     def open(self):
         """Open Connection."""
         rabbit_connected = False
-        print('[rabbitmq-consumer:open] Opening Connection..')
-        print("[rabbitmq-consumer:open] Checking RabbitMQ..")
+        log('AMPQSTORM:open', 'Opening Connection..')
+        log("AMPQSTORM:open", "Checking RabbitMQ..")
         while not rabbit_connected:
             try:
                 credentials = pika.PlainCredentials(self.username, self.password)
@@ -33,11 +36,11 @@ class Consumer(object):
                                                                                socket_timeout=2,
                                                                                blocked_connection_timeout=2))
                 rabbit_connected = True
-                print("[rabbitmq-consumer:open] RabbitMQ is up!")
+                log("AMPQSTORM:open", "RabbitMQ is up!")
                 connection.close()
             except:
                 rabbit_connected = False
-                print("[rabbitmq-consumer:open] RabbitMQ not reachable.. waiting..")
+                log("AMPQSTORM:open", "RabbitMQ not reachable.. waiting..")
                 sleep(2)
 
         self.connection = amqpstorm.Connection(self.host, self.username,
@@ -51,7 +54,7 @@ class Consumer(object):
                               durable=True)
 
         # Create the APIService queue
-        print('[rabbitmq-consumer:open] Creating queue: ' + self.rpc_queue)
+        log('AMPQSTORM:open', 'Creating queue:  {0}'.format(self.rpc_queue))
         self.channel.queue.declare(self.rpc_queue, durable=True, exclusive=False, auto_delete=False, arguments=None)
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='NewAgent')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='AgentTaskUpdate')
@@ -98,41 +101,45 @@ class Consumer(object):
         """
         # TODO: This could be more nuanced, but who has time for that.
         try:
-            print('[rabbitmq-consumer:_on_response] Message Properties: ' + json.dumps(message.properties))
-            print('[rabbitmq-consumer:_on_response] Message Body: ' + message.body)
+            log('AMPQSTORM:_on_response', 'Message Properties:  {0}'.format(json.dumps(message.properties)))
+            log('AMPQSTORM:_on_response', 'Message Body:  {0}'.format(message.body))
 
-            if message.properties['message_type'] == 'NewAgent':
-                print("[rabbitmq-consumer:_on_response] Got NewAgent at {0}".format(message.timestamp))
+            if message.correlation_id in self.queue:
+                log('AMPQSTORM:_on_response', 'Got a response to one of our messages. Updating queue.')
+                self.queue[message.correlation_id] = message.body
+
+            elif message.properties['message_type'] == 'NewAgent':
+                log("AMPQSTORM:_on_response", "Got NewAgent at {0}".format(message.timestamp))
                 agent = json.loads(message.body)
                 agent['Success'] = True
-                print("[rabbitmq-consumer:_on_response] Publishing message: {0}".format(str(agent)))
+                log("AMPQSTORM:_on_response", "Publishing message: {0}".format(str(agent)))
                 self.socketio.emit('newAgent', agent, broadcast=True)
 
             elif message.properties['message_type'] == 'AgentCheckinAnnouncement':
-                print("[rabbitmq-consumer:_on_response] Got AgentCheckinAnnouncement at {0}".format(message.timestamp))
+                log("AMPQSTORM:_on_response", "Got AgentCheckinAnnouncement at {0}".format(message.timestamp))
                 agentCheckin = json.loads(message.body)
-                print("[rabbitmq-consumer:_on_response] Publishing message: {0}".format(str(agentCheckin)))
+                log("AMPQSTORM:_on_response", "Publishing message: {0}".format(str(agentCheckin)))
                 self.socketio.emit('agentCheckin', agentCheckin)
 
             elif message.properties['message_type'] == 'AgentUpdated':
-                print("[rabbitmq-consumer:_on_response] Got AgentUpdated at {0}".format(message.timestamp))
+                log("AMPQSTORM:_on_response", "Got AgentCheckin at {0}".format(message.timestamp))
                 agentUpdated = json.loads(message.body)
-                print("[rabbitmq-consumer:_on_response] Publishing message: {0}".format(str(agentUpdated)))
+                log("AMPQSTORM:_on_response", "Publishing message: {0}".format(str(agentUpdated)))
                 self.socketio.emit('agentUpdated', agentUpdated)
 
             elif message.properties['message_type'] == 'ConsoleMessageAnnouncement':
-                print("[rabbitmq-consumer:_on_response] Got ConsoleMessageAnnouncement")
+                log("AMPQSTORM:_on_response", "Got ConsoleMessageAnnouncement")
                 message = json.loads(message.body)
                 consoleMessage = message['ConsoleMessage']
                 consoleMessage['Username'] = message['Username']
                 consoleMessage.pop('Content', None)
-                print("[rabbitmq-consumer:_on_response] Publishing message: {0}".format(str(consoleMessage)))
+                log("AMPQSTORM:_on_response", "Publishing message: {0}".format(str(consoleMessage)))
                 self.socketio.emit('consoleMessageAnnouncement', consoleMessage, room=consoleMessage["AgentId"])
 
             elif message.properties['message_type'] == 'ErrorMessageAnnouncement':
-                print("[rabbitmq-consumer:_on_response] Got ErrorMessageAnnouncement at {0}".format(message.timestamp))
+                log("AMPQSTORM:_on_response", "Got ErrorMessageAnnouncement at {0}".format(message.timestamp))
                 errorMessageAnnouncement = json.loads(message.body)
-                print("[rabbitmq-consumer:_on_response] Publishing message: {0}".format(str(errorMessageAnnouncement)))
+                log("AMPQSTORM:_on_response", "Publishing message: {0}".format(str(errorMessageAnnouncement)))
                 # TL;DR - We only broadcast errors if they didn't come from API
                 # I *think* this is the right way to go about this. API errors shouldn't typically be of interest to
                 # everyone using Faction and the API is going to reply back with the error message when it encounters
@@ -143,55 +150,55 @@ class Consumer(object):
                     self.socketio.emit('errorMessageAnnouncement', errorMessageAnnouncement, broadcast=True)
 
             elif message.properties['message_type'] == 'NewFactionFile':
-                print("[rabbitmq-consumer:_on_response] Got NewFactionFile")
+                log("AMPQSTORM:_on_response", "Got NewFactionFile")
                 fileMessage = json.loads(message.body)
-                print("[rabbitmq-consumer:_on_response] Emitting: " + message.body)
+                log("AMPQSTORM:_on_response", "Emitting: {0}".format(message.body))
                 self.socketio.emit('newFile', fileMessage)
 
             # elif message.properties['message_type'] == 'NewTransport':
-            #     print("[rabbitmq-consumer:_on_response] Got NewTransport")
+            #     log("AMPQSTORM:_on_response", "Got PayloadUpdate")
             #     transportMessage = json.loads(message.body)
-            #     print("[rabbitmq-consumer:_on_response] Emitting: " + message.body)
+            #     log("AMPQSTORM:_on_response", "Emitting: {0}".format(message.body))
             #     self.socketio.emit('newTransport', transportMessage)
 
             elif message.properties['message_type'] == 'PayloadUpdate':
-                print("[rabbitmq-consumer:_on_response] Got PayloadUpdate")
+                log("AMPQSTORM:_on_response", "Got PayloadUpdate")
                 payloadUpdateMessage = json.loads(message.body)
-                print("[rabbitmq-consumer:_on_response] Emitting: " + message.body)
+                log("AMPQSTORM:_on_response", "Emitting: {0}".format(message.body))
                 self.socketio.emit('updatePayload', payloadUpdateMessage)
 
             elif message.properties['message_type'] == 'PayloadUpdated':
-                print("[rabbitmq-consumer:_on_response] Got PayloadUpdated")
+                log("AMPQSTORM:_on_response", "Got PayloadUpdate")
                 payloadUpdateMessage = json.loads(message.body)
-                print("[rabbitmq-consumer:_on_response] Emitting: " + message.body)
+                log("AMPQSTORM:_on_response", "Emitting: {0}".format(message.body))
                 self.socketio.emit('payloadUpdated', payloadUpdateMessage)
 
             elif message.properties['message_type'] == 'TransportCreated':
-                print("[rabbitmq-consumer:_on_response] Got TransportCreated")
+                log("AMPQSTORM:_on_response", "Got TransportCreated")
                 transportMessage = json.loads(message.body)
-                print("[rabbitmq-consumer:_on_response] Emitting: " + message.body)
+                log("AMPQSTORM:_on_response", "Emitting: {0}".format(message.body))
                 self.socketio.emit('transportCreated', transportMessage)
 
             elif message.properties['message_type'] == 'TransportUpdated':
-                print("[rabbitmq-consumer:_on_response] Got TransportUpdated")
+                log("AMPQSTORM:_on_response", "Got TransportUpdated")
                 transportMessage = json.loads(message.body)
-                print("[rabbitmq-consumer:_on_response] Emitting: " + message.body)
+                log("AMPQSTORM:_on_response", "Emitting: {0}".format(message.body))
                 self.socketio.emit('transportUpdated', transportMessage)
 
             elif message.properties['message_type'] == 'AgentCheckinAnnouncement':
-                print("[rabbitmq-consumer:_on_response] Got AgentCheckinAnnouncement!")
+                log("AMPQSTORM:_on_response", "Got AgentCheckinAnnouncement!")
 
             elif message.properties['message_type'] == 'AgentTaskUpdate':
-                print("[rabbitmq-consumer:_on_response] Got AgentTaskUpdate")
+                log("AMPQSTORM:_on_response", "Got AgentTaskUpdate")
         except Exception as e:
-            print("[rabbitmq-consumer:_on_response] ERROR PROCESSING RABBITMQ MESSAGE: {0}".format(e))
+            log("AMPQSTORM:_on_response", "ERROR PROCESSING RABBITMQ MESSAGE: {0}".format(e))
 
             # cmd_obj = json.loads(message.body)
             # cmd_obj['Username'] = 'AGENT'
-            # print('[rabbitmq-consumer] emitting. AgentId ' + str(cmd_obj['AgentId']) + ' Body: ' + message.body)
+            # log('AMPQSTORM', 'emitting. AgentId ' + str(cmd_obj['AgentId']) + ' Body:  {0}'.format(message.body)
             # self.socketio.emit('newMessage', cmd_obj, room=cmd_obj['AgentId'])
         # else:
-        #     print('[rabbitmq-consumer] Not for us.. nacking..')
+        #     log('AMPQSTORM', 'Not for us.. nacking..')
         #     message.nack()
 
 
@@ -253,7 +260,7 @@ class Producer(object):
 
     def send_request(self, routing_key, message, callback=False):
         # Create the Message object.
-        print("[rabbitmq-producer:send_request] Got message: {0} with routing_key: {1}".format(message, routing_key))
+        log("AMPQSTORM:send_request", "Got message: {0} with routing_key: {1}".format(message, routing_key))
         message = Message.create(self.channel, json.dumps(message))
 
         if callback:
@@ -265,7 +272,7 @@ class Producer(object):
         message.properties['message_type'] = routing_key
 
         # Publish the RPC request.
-        print("[rabbitmq-producer:send_request] Publishing message..")
+        log("AMPQSTORM:send_request", "Publishing message..")
         message.publish(routing_key=routing_key, exchange='Core')
 
         # Return the Unique ID used to identify the request.

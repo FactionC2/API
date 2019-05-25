@@ -9,9 +9,9 @@ RUN apk add --no-cache \
             make \
             libffi-dev \
             libcap \
-            postgresql-dev \
+            musl-dev \
             gcc \
-            musl-dev
+            postgresql-dev
 ADD . /app
 WORKDIR /app
 COPY ./docker_build/logging.conf /app/logging.conf

@@ -1,9 +1,12 @@
 from models.agent import Agent
-from backend.rabbitmq import rabbit_producer
+from models.staging_message import StagingMessage
+from backend.database import db
+from backend.rabbitmq import rpc_client
+from logger import log
 
 
 def agent_json(agent):
-    print("[agent_json] Working on %s" % agent)
+    log("agent_json", "Working on %s" % agent)
     tasks = []
     # if agent.tasks:
     #     for task in agent.tasks:
@@ -41,7 +44,7 @@ def agent_json(agent):
 
 
 def get_agent(agent_id, include_hidden=False):
-    print("[get_agent] got agent id " + str(agent_id))
+    log("get_agent", "got agent id " + str(agent_id))
     if agent_id == 'all':
         if include_hidden:
             agents = Agent.query.all()
@@ -69,6 +72,6 @@ def update_agent(agent_id, agent_name=None, visible=None):
         "Name": agent.Name,
         "Visible": agent.Visible
     })
-    print("[update_agent] sending message: {0}".format(message))
-    rabbit_producer.send_request("UpdateAgent", message)
+    log("update_agent", "sending message: {0}".format(message))
+    rpc_client.send_request("UpdateAgent", message)
     return {"Success": True, "Result": agent_json(agent)}

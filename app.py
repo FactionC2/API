@@ -6,8 +6,8 @@ from flask_restful import Api
 from flask_cors import CORS
 import eventlet
 
-from config import SECRET_KEY, DB_URI, RABBIT_URL, RABBIT_HOST, RABBIT_USERNAME, RABBIT_PASSWORD, UPLOAD_DIR
-
+from config import SECRET_KEY, DB_URI, RABBIT_URL, UPLOAD_DIR
+from logger import log
 from backend.database import db
 from backend.cache import cache
 
@@ -36,7 +36,7 @@ dev = True
 
 
 def create_app():
-    print("[app.py:CreateApp] - Started..")
+    log("app.py:CreateApp", " - Started..")
     app = Flask(__name__)
     app.config['DEBUG'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = DB_URI
@@ -87,21 +87,21 @@ def create_app():
     socketio.init_app(app, host='0.0.0.0', manage_session=False, message_queue=RABBIT_URL, channel="ConsoleMessages")
     CORS(app, supports_credentials=dev)
     cache.init_app(app)
-    print("[app.py:CreateApp] - Finished.")
+    log("app.py:CreateApp", " - Finished.")
 
     return app
 
 
 app = create_app()
 consumer = Consumer(RABBIT_HOST, RABBIT_USERNAME, RABBIT_PASSWORD, 'ApiService', socketio)
-print("[app.py] app created, continuing..")
+log("app.py", "app created, continuing..")
 
 if not os.path.exists(UPLOAD_DIR):
     os.makedirs(UPLOAD_DIR)
 
 
 if __name__ == '__main__':
-    print("[app.py:main] main starting...")
+    log("app.py:main", "main starting...")
     socketio.start_background_task(target=consumer.process_data_events)
     socketio.run(app, host='0.0.0.0', max_size=4192)
 else:

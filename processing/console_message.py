@@ -10,6 +10,8 @@ from models.user import User
 
 from backend.rabbitmq import rabbit_producer
 from processing.faction_file import get_faction_file_bytes
+from logger import log
+
 
 def console_message_json(message):
     if (message.UserId):
@@ -40,7 +42,7 @@ def new_console_message(agent_id, content):
     if len(filenames) > 0:
         for filename in filenames:
             name = filename.replace("f2:files/","")
-            print("[new_console_message] getting bytes for file {0}".format(name))
+            log("new_console_message", "getting bytes for file {0}".format(name))
             result = get_faction_file_bytes(name)
             if result['Success']:
                 content = content.replace(filename, result['Message'])
@@ -56,8 +58,8 @@ def new_console_message(agent_id, content):
         "Display": display
     }
 
-    print("[add_message] publishing message: {0}".format(console_message))
-    rabbit_producer.send_request('NewConsoleMessage', console_message)
+    log("add_message", "publishing message: {0}".format(console_message))
+    rpc_client.send_request('NewConsoleMessage', console_message)
     return console_message
 
 def get_console_message(console_message_id):
@@ -95,9 +97,9 @@ def get_console_message_by_task(agent_task_id):
         console_messages = ConsoleMessage.query.filter_by(AgentTaskId=agent_task_id)
         results = []
         if console_messages.count() > 0:
-            print("[get_console_message_by_task] Got count. Going.")
+            log("get_console_message_by_task", "Got count. Going.")
             for message in console_messages:
-                print("[get_console_message_by_task] Working on: {0}".format(message))
+                log("get_console_message_by_task", "Working on: {0}".format(message))
                 results.append(console_message_json(message))
         return {
             "Success": True,
