@@ -3,7 +3,7 @@ from datetime import datetime
 
 from flask import json, request
 from flask_socketio import SocketIO
-from backend.rabbitmq import rpc_client
+from backend.rabbitmq import rabbit_producer
 from models.agent import Agent
 from models.agent_checkin import AgentCheckin
 from models.agent_task_update import AgentTaskUpdate
@@ -61,10 +61,9 @@ def add_agent_checkin(agent_name, transport_id=None, source_ip=None, message=Non
         'Message': msg
     }
 
-
     log("add_agent_task_response", "publishing?")
     #publish_message('Core', 'AgentCheckin', json_string)
-    rpc_client.send_request('NewAgentCheckin', checkin)
+    rabbit_producer.send_request('NewAgentCheckin', checkin)
     return {
         'Success': True,
         'Result': checkin

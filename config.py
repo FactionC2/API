@@ -1,5 +1,7 @@
 import os
 import json
+from logger import log
+
 
 config_file_path = '/opt/faction/global/config.json'
 
@@ -22,7 +24,7 @@ def get_config():
             config["RABBIT_HOST"] = os.environ["RABBIT_HOST"]
             return config
     except:
-        print("Could not load config file: {0}".format(config_file_path))
+        log("config.py", "Could not load config file: {0}".format(config_file_path))
         exit(1)
 
 FACTION_CONFIG = get_config()

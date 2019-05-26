@@ -8,7 +8,7 @@ from models.agent import Agent
 from models.agent_task import AgentTask
 from models.user import User
 
-from backend.rabbitmq import rpc_client
+from backend.rabbitmq import rabbit_producer
 from processing.faction_file import get_faction_file_bytes
 from logger import log
 
@@ -59,7 +59,7 @@ def new_console_message(agent_id, content):
     }
 
     log("add_message", "publishing message: {0}".format(console_message))
-    rpc_client.send_request('NewConsoleMessage', console_message)
+    rabbit_producer.send_request('NewConsoleMessage', console_message)
     return console_message
 
 def get_console_message(console_message_id):

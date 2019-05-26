@@ -28,7 +28,7 @@ def authorized_groups(groups):
     def decorator(f):
         @functools.wraps(f)
         def wrapped(*args, **kwargs):
-            print('[User Role - Authorized Groups] Checking if authenticated..')
+            log("User Role - Authorized Groups", "Checking if authenticated..")
             if not current_user.is_authenticated:
                 print('Not authenticated.')
                 return {
@@ -58,7 +58,7 @@ def authorized_groups(groups):
                 group_id = get_role_id(group)
                 log("User Role - Authorized Groups", "group id: {0}".format(group_id))
                 if current_user.RoleId == group_id:
-                    print('[User Role - Authorized Groups] Authorized.')
+                    log("User Role - Authorized Groups", "Authorized.")
                     authorized = True
 
             if not authorized:

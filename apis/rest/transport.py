@@ -2,6 +2,7 @@ from flask import jsonify
 from flask_restful import Resource, reqparse
 from processing.user_role import authorized_groups
 from processing.transport import get_transport, new_transport, update_transport
+from logger import log
 
 
 # These parsers take arguments from a rest request and parse them

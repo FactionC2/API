@@ -2,7 +2,7 @@ from datetime import datetime
 
 from flask import json
 from flask_socketio import SocketIO
-from backend.rabbitmq import rpc_client
+from backend.rabbitmq import rabbit_producer
 
 from models.agent import Agent
 from models.ioc import IOC
@@ -52,7 +52,7 @@ def ioc_json(ioc):
 def get_ioc(ioc_id='all'):
     iocs = []
     results = []
-    print("Got IOC: {0}".format(ioc_id))
+    log("ioc.py", "Got IOC: {0}".format(ioc_id))
     if ioc_id == 'all':
         iocs = IOC.query.all()
     else:

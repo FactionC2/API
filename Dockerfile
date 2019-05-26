@@ -23,6 +23,7 @@ RUN addgroup -S -g 1337 gunicorn && \
     mkdir -p ./cache && \
     chown gunicorn:gunicorn ./cache
 EXPOSE 5000
+
 USER gunicorn
 CMD ["/usr/bin/gunicorn", \
   "--worker-class", "eventlet", \

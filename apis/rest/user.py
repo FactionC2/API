@@ -4,6 +4,8 @@ from flask_login import current_user, login_required
 from processing import user, user_role
 from processing.user_role import authorized_groups
 from processing.api_key import new_api_key
+from logger import log
+
 
 user_parser = reqparse.RequestParser()
 user_parser.add_argument('Username')
@@ -37,7 +39,7 @@ class LoginEndpoint(Resource):
 
     def post(self):
         args = user_parser.parse_args()
-        print('GOT ARGS: %s' % args)
+        log("user.py:loginEndpoint", "Login for user: {}".format(args['Username']))
         return jsonify(user.login_faction_user(args['Username'], args['Password']))
 
 
@@ -68,7 +70,6 @@ class ChangePasswordEndpoint(Resource):
     def patch(self, user_id):
         args = change_password_parser.parse_args()
         return jsonify(user.update_password(user_id, args['NewPassword']))
-
 
 
 class ApiKeyEndpoint(Resource):

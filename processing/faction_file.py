@@ -8,7 +8,7 @@ from itsdangerous import URLSafeSerializer
 from flask_login import current_user
 from werkzeug.utils import secure_filename
 from backend.database import db
-from backend.rabbitmq import rpc_client
+from backend.rabbitmq import rabbit_producer
 
 from config import UPLOAD_DIR
 
@@ -128,7 +128,7 @@ def new_faction_file(filename, filecontent, user_id=None, agent_id=None, hash=No
             'Success': True,
             'Result': faction_file_json(faction_file)
         })
-        rpc_client.socketio.emit('newFile', message)
+        rabbit_producer.socketio.emit('newFile', message)
         return faction_file
     except Exception as e:
         error_message = str(e)
@@ -172,8 +172,8 @@ def upload_faction_file(agent_name=None, hash=None, file_name=None, file_content
 
 def download_faction_file(faction_file_name):
     faction_file = FactionFile.query.filter_by(Name=faction_file_name).order_by(FactionFile.Id.desc()).first()
-    print("UploadDir {0}".format(UPLOAD_DIR))
-    print("FileUploadDir {0}".format(files_upload_dir))
+    log("faction_file.py", "UploadDir {0}".format(UPLOAD_DIR))
+    log("faction_file.py", "FileUploadDir {0}".format(files_upload_dir))
     log("faction_file:download_faction_file", "upload path: {0}".format(files_upload_dir))
     if faction_file.Name:
         path = os.path.join(files_upload_dir, faction_file.Name)

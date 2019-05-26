@@ -1,13 +1,11 @@
 import os
 import secrets
-import psycopg2
-from time import sleep
+import threading
 
-from flask import Flask, send_from_directory
+from flask import Flask
 from flask_restful import Api
 from flask_cors import CORS
 import eventlet
-import pika
 
 from config import SECRET_KEY, DB_URI, RABBIT_URL, UPLOAD_DIR
 from logger import log
@@ -32,13 +30,14 @@ from apis.rest.user import LoginEndpoint, ChangePasswordEndpoint, ApiKeyEndpoint
     UserRoleEndpoint
 
 from apis.socketio import socketio
+from backend.rabbitmq import rabbit_consumer
 
 # Setting this to true weakens CORS. DO NOT LEAVE THIS SET TO TRUE IN PROD
 dev = True
 
-
+log("app.py:main", "Started..")
 def create_app():
-    log("app.py:CreateApp", " - Started..")
+    log("app.py:CreateApp", "Started..")
     app = Flask(__name__)
     app.config['DEBUG'] = True
     app.config['SQLALCHEMY_DATABASE_URI'] = DB_URI
@@ -85,23 +84,23 @@ def create_app():
     api.add_resource(StagingEndpoint, '/staging/', '/staging/<string:payload_name>/<string:staging_id>/')
     api.add_resource(TransportEndpoint, '/transport/', '/transport/<int:transport_id>/')
 
-    login_manager.init_app(app)
-    socketio.init_app(app, host='0.0.0.0', manage_session=False, message_queue=RABBIT_URL, channel="ConsoleMessages")
     CORS(app, supports_credentials=dev)
     cache.init_app(app)
-    log("app.py:CreateApp", " - Finished.")
+    login_manager.init_app(app)
 
+    socketio.init_app(app, host='0.0.0.0', manage_session=False, message_queue=RABBIT_URL, channel="ConsoleMessages")
+    rabbit_consumer.socketio = socketio
+    socketio.start_background_task(target=rabbit_consumer.process_data_events)
+    log("app.py:CreateApp", "Finished.")
     return app
 
-
-app = create_app()
-log("app.py", "app created, continuing..")
 
 if not os.path.exists(UPLOAD_DIR):
     os.makedirs(UPLOAD_DIR)
 
+
 if __name__ == '__main__':
     log("app.py:main", "main starting...")
-    socketio.run(app, host='0.0.0.0', max_size=4192)
+    create_app()
 else:
-    print("foo")
+    app = create_app()

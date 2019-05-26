@@ -1,4 +1,4 @@
-from backend.rabbitmq import rpc_client
+from backend.rabbitmq import rabbit_producer
 from models.error_message import ErrorMessage
 
 def error_message_json(error_message):
@@ -17,7 +17,7 @@ def create_error_message(message, details=None):
         'Message': message,
         'Details': details
     })
-    rpc_client.send_request("NewErrorMessage", error_message)
+    rabbit_producer.send_request("NewErrorMessage", error_message)
     return error_message
 
 def new_error_message(source, message):
@@ -25,7 +25,7 @@ def new_error_message(source, message):
         "Source": source,
         "Message": message
     })
-    rpc_client.send_request("NewErrorMessage", error_message)
+    rabbit_producer.send_request("NewErrorMessage", error_message)
 
     return dict({
         'Success': True,
