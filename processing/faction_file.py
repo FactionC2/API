@@ -172,8 +172,8 @@ def upload_faction_file(agent_name=None, hash=None, file_name=None, file_content
 
 def download_faction_file(faction_file_name):
     faction_file = FactionFile.query.filter_by(Name=faction_file_name).order_by(FactionFile.Id.desc()).first()
-    print("UploadDir {0}".format(UPLOAD_DIR))
-    print("FileUploadDir {0}".format(files_upload_dir))
+    log("faction_file.py", "UploadDir {0}".format(UPLOAD_DIR))
+    log("faction_file.py", "FileUploadDir {0}".format(files_upload_dir))
     log("faction_file:download_faction_file", "upload path: {0}".format(files_upload_dir))
     if faction_file.Name:
         path = os.path.join(files_upload_dir, faction_file.Name)

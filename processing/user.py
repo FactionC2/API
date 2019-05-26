@@ -43,7 +43,7 @@ def login_faction_user(username, password):
     if user:
         log("login_faction_user", "Got user: " + user.Username)
         if bcrypt.checkpw(password.encode('utf-8'), user.Password) and user.Enabled:
-            print('[login_faction_user] Login successful')
+            log("login_faction_user", "Login successful")
             # System user is treated a little special
             if user.Username.lower() == 'system' or user.Id == 1:
                 expiration_time = datetime.utcnow() - timedelta(minutes=5)

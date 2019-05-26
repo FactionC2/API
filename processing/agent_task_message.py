@@ -5,6 +5,7 @@ from sqlalchemy import and_
 
 from models.agent import Agent
 from models.agent_task_message import AgentTaskMessage
+from logger import log
 
 
 def agent_task_message_json(task_message):
@@ -17,6 +18,7 @@ def agent_task_message_json(task_message):
             'Message' : task_message.Message
          })
     return result
+
 
 def agent_task_message_envelope_json(agent_name, encoded_messages):
     result = dict(
@@ -33,7 +35,7 @@ def get_unsent_agent_task_messages(agent_name):
     agent = Agent.query.filter_by(Name=agent_name).first()
     results = AgentTaskMessage.query.filter(and_(AgentTaskMessage.AgentId == agent.Id, AgentTaskMessage.Sent == False)).all()
     messages = ''
-    print('[get_unsent_task_messages] got results: %s', str(results))
+    log("get_unsent_task_messages", "got results: {}".format(str(results)))
     if len(results) != 0:
         messages = []
         for result in results:
@@ -43,5 +45,5 @@ def get_unsent_agent_task_messages(agent_name):
             db.session.commit()
     encoded_messages = base64.b64encode(str(messages).encode('utf-8'))
     response = agent_task_message_envelope_json(agent_name, encoded_messages)
-    print('[get_unsent_task_messages] returning: ' + str(response))
+    log("get_unsent_task_messages", "returning:  {}".format(response))
     return response

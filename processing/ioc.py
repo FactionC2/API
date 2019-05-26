@@ -52,7 +52,7 @@ def ioc_json(ioc):
 def get_ioc(ioc_id='all'):
     iocs = []
     results = []
-    print("Got IOC: {0}".format(ioc_id))
+    log("ioc.py", "Got IOC: {0}".format(ioc_id))
     if ioc_id == 'all':
         iocs = IOC.query.all()
     else:

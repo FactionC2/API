@@ -125,7 +125,7 @@ def new_payload(description,
                 expiration_date=None):
 
     log("payload:new_payload", "Got request")
-    print("Jitter: {0}, Interval: {1}, AgentType: {2}, ExpirationDate: {3}".format(jitter, interval, agent_type, expiration_date))
+    log("payload:new_payload", "Details - Jitter: {0}, Interval: {1}, AgentType: {2}, ExpirationDate: {3}".format(jitter, interval, agent_type, expiration_date))
 
     if expiration_date != None:
         try:
@@ -190,12 +190,12 @@ def new_payload(description,
     })
 
     log("payload:new_payload", "Publishing: {0}".format(publish_message))
-    message_id = rpc_client.send_request("NewPayload", publish_message, callback=True)
+    message_id = rabbit_producer.send_request("NewPayload", publish_message, callback=True)
 
     # Wait for our response
     # TODO: Add actual timeout here.
     i = 0
-    while rpc_client.queue[message_id] is None and i < 15:
+    while rabbit_producer.queue[message_id] is None and i < 15:
         log("payload:new_payload", "Waiting for {0} seconds".format(15 - i))
         sleep(1)
         i += 1
@@ -242,7 +242,7 @@ def update_payload(payload_id, enabled=None, jitter=None, interval=None, visible
         "Visible": payload.Visible
     })
 
-    print("Sending: {0}".format(message))
+    log("payload.py:update_payload", "Sending: {0}".format(message))
     rabbit_producer.send_request("UpdatePayload", message)
     return dict({"Success": True, "Payload": payload_json(payload)})
 

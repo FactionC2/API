@@ -61,7 +61,6 @@ def add_agent_checkin(agent_name, transport_id=None, source_ip=None, message=Non
         'Message': msg
     }
 
-
     log("add_agent_task_response", "publishing?")
     #publish_message('Core', 'AgentCheckin', json_string)
     rabbit_producer.send_request('NewAgentCheckin', checkin)

@@ -2,17 +2,19 @@ import json
 from time import sleep
 from flask_login import current_user
 from backend.database import db
-from backend.rabbitmq import rabbit_producer
+from backend.rabbitmq import rabbit_producer, rabbit_consumer
 
 from models.transport import Transport
 from processing.api_key import new_api_key, get_api_key
 from processing.error_message import create_error_message
+from logger import log
+
 
 def transport_json(transport):
-    print('[transport_json] working on transport: {0}'.format(transport))
-    print('[transport_json] getting api key with id: {0}'.format(transport.ApiKeyId))
+    log("transport_json", "working on transport: {0}".format(transport))
+    log("transport_json", "getting api key with id: {0}".format(transport.ApiKeyId))
     apiKey = get_api_key(transport.ApiKeyId)
-    print('[transport_json] got apiKey: {0}'.format(apiKey))
+    log("transport_json", "got apiKey: {0}".format(apiKey))
     apiKeyName = apiKey["Results"][0]["Name"]
 
 
@@ -40,7 +42,7 @@ def transport_json(transport):
 
 
 def get_transport(transport_id='all', include_hidden=False):
-    print("got transport id: {0}".format(transport_id))
+    log("transport.py:get_transport", "got transport id: {0}".format(transport_id))
     results = []
     transports = []
     if transport_id == 'all':
@@ -66,30 +68,20 @@ def new_transport(name):
         "UserId": current_user.Id
     })
 
-<<<<<<< HEAD
-    print("[transport:new_transport] Publishing: {0}".format(publish_message))
-    message_id = rabbit_producer.send_request("NewTransport", publish_message, callback=True)
-=======
     log("transport:new_transport", "Publishing: {0}".format(publish_message))
-    message_id = rpc_client.send_request("NewTransport", publish_message, callback=True)
->>>>>>> master
+    message_id = rabbit_producer.send_request("NewTransport", publish_message, callback=True)
 
     # Wait for our response
     # TODO: Add actual timeout here.
     i = 0
-<<<<<<< HEAD
     while i < 20:
-        print("[transport:new_transport] Waiting for {0} seconds".format(9999 - i))
-=======
-    while i < 10:
-        log("transport:new_transport", "Waiting for {0} seconds".format(9999 - i))
->>>>>>> master
+        log("transport:new_transport", "Waiting for {0} seconds".format(20 - i))
         sleep(1)
         i += 1
-        print(i)
 
         # Return data
-        message = rabbit_producer.queue[message_id]
+        log("transport:new_transport", "queue: {}".format(rabbit_consumer.queue))
+        message = rabbit_consumer.queue.get(message_id)
 
         if message:
             log("transport:new_transport", "Got response from Core: {0}".format(message))
@@ -98,10 +90,6 @@ def new_transport(name):
             if 'Transport' in message_dict.keys():
 
                 transport = Transport.query.get(message_dict['Transport']['Id'])
-                transport.ApiKeyId = apiKey["Id"]
-                db.session.add(transport)
-                db.session.commit()
-                rabbit_producer.socketio.emit("UpdateTransport", {"Success": True, "Transport": transport_json(transport)})
                 return {
                     "Success": True,
                     "TransportId": transport.Id,
@@ -152,13 +140,8 @@ def update_transport(transport_id, name=None, transport_type=None, guid=None, co
     # Wait for our response
     # TODO: Add actual timeout here.
     i = 0
-<<<<<<< HEAD
     while rabbit_producer.queue[message_id] is None and i < 15:
-        print("[transport:new_transport] Waiting for {0} seconds".format(15 - i))
-=======
-    while rpc_client.queue[message_id] is None and i < 15:
         log("transport:new_transport", "Waiting for {0} seconds".format(15 - i))
->>>>>>> master
         sleep(1)
         i += 1
 
