@@ -140,13 +140,13 @@ def update_transport(transport_id, name=None, transport_type=None, guid=None, co
     # Wait for our response
     # TODO: Add actual timeout here.
     i = 0
-    while rabbit_producer.queue[message_id] is None and i < 15:
+    while rabbit_consumer.queue[message_id] is None and i < 15:
         log("transport:new_transport", "Waiting for {0} seconds".format(15 - i))
         sleep(1)
         i += 1
 
     # Return data
-    message = rabbit_producer.queue[message_id]
+    message = rabbit_consumer.queue[message_id]
 
     if message:
         return json.loads(message)

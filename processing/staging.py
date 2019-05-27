@@ -8,7 +8,7 @@ from models.staging_response import StagingResponse
 
 from processing.agent import get_agent
 
-from backend.rabbitmq import rabbit_producer
+from backend.rabbitmq import rabbit_producer, rabbit_consumer
 from logger import log
 
 def staging_message_json(staging_message):
@@ -84,13 +84,13 @@ def new_staging_message(payload_name, staging_id, transport_id, message, source_
     # Wait for our response
     log("staging_message:new_staging_message", "Waiting for 10 seconds")
     i = 0
-    while rabbit_producer.queue[message_id] is None and i < 10:
+    while rabbit_consumer.queue[message_id] is None and i < 10:
         log("staging_message:new_staging_message", "Waiting for {0} seconds".format(10 - i))
         sleep(1)
         i += 1
 
     # Return data
-    message = rabbit_producer.queue[message_id]
+    message = rabbit_consumer.queue[message_id]
 
     if message:
         log("staging_message", "Got response from Core: {0}".format(message))
