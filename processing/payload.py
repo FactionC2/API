@@ -91,6 +91,7 @@ def payload_json(payload):
     log("payload_json", "returning {0}".format(result))
     return result
 
+
 def get_payload(payload_id, include_hidden=False):
     log("get_payload", "got payload id " + str(payload_id) + ", show hidden: " + str(include_hidden))
     if payload_id == 'all':

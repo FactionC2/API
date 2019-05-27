@@ -225,15 +225,6 @@ class Producer(object):
         self.callback_queue = None
         self.open()
 
-    def _on_response(self, message):
-        """On Response store the message with the correlation id in a local
-         dictionary.
-        """
-        log("rabbitmq-producer:_on_response", "Got message: {0}".format(message))
-        if message.correlation_id in self.queue:
-            log("rabbitmq-producer:_on_response", "Got a response to one of our messages. Updating queue.")
-            self.queue[message.correlation_id] = message.body
-
     def open(self):
         """Open Connection."""
         rabbit_connected = False
@@ -259,14 +250,12 @@ class Producer(object):
         # Create the Message object.
         log("rabbitmq-producer:send_request", "Got message: {0} with routing_key: {1}".format(message, routing_key))
 
+        message = Message.create(rabbit_consumer.channel, json.dumps(message))
         if callback:
-            message = Message.create(rabbit_consumer.channel, json.dumps(message))
             message.reply_to = rabbit_consumer.callback_queue
             rabbit_consumer.update_queue(message.correlation_id)
         # Create an entry in our local dictionary, using the automatically
         # generated correlation_id as our key.
-        else:
-            message = Message.create(self.channel, json.dumps(message))
 
         message.properties['message_type'] = routing_key
 
