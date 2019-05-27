@@ -11,7 +11,7 @@ from werkzeug.utils import secure_filename
 from processing.error_message import create_error_message
 
 from backend.database import db
-from backend.rabbitmq import rabbit_producer
+from backend.rabbitmq import rabbit_producer, rabbit_consumer
 
 from config import UPLOAD_DIR, SECRET_KEY
 from models.payload import Payload
@@ -90,6 +90,7 @@ def payload_json(payload):
     }
     log("payload_json", "returning {0}".format(result))
     return result
+
 
 def get_payload(payload_id, include_hidden=False):
     log("get_payload", "got payload id " + str(payload_id) + ", show hidden: " + str(include_hidden))
@@ -195,13 +196,13 @@ def new_payload(description,
     # Wait for our response
     # TODO: Add actual timeout here.
     i = 0
-    while rabbit_producer.queue[message_id] is None and i < 15:
+    while rabbit_consumer.queue[message_id] is None and i < 15:
         log("payload:new_payload", "Waiting for {0} seconds".format(15 - i))
         sleep(1)
         i += 1
 
     # Return data
-    message = rabbit_producer.queue[message_id]
+    message = rabbit_consumer.queue[message_id]
 
     if message:
         log("payload:new_payload", "Got response from Build Server: {0}".format(message))

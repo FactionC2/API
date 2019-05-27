@@ -16,7 +16,7 @@ def connect_handler():
     log("Socketio Connect Handler", "Connection started..")
     if current_user.is_authenticated:
         log("Socketio Connect Handler", "User {0} authenticated".format(current_user.Username))
-        emit('{0} has connected'.format(current_user.Username), broadcast=True)
+        emit('{0} has connected'.format(current_user.Username), broadcast=True, include_self=False)
     else:
         log("Socketio Connect Handler", "Connection not authenticated")
 
@@ -27,7 +27,7 @@ def disconnect_handler():
     log("Socketio Disconnect Handler", "Disconnection started..")
     if current_user.is_authenticated:
         log("Socketio Disconnect Handler", "User {0} authenticated".format(current_user.Username))
-        emit('{0} has disconnected'.format(current_user.Username), broadcast=True)
+        emit('{0} has disconnected'.format(current_user.Username), broadcast=True, include_self=False)
     else:
         log("Socketio Disconnect Handler", "Connection not authenticated")
 
