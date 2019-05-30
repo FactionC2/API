@@ -1,8 +1,8 @@
 import json
 from time import sleep
 from flask_login import current_user
-from backend.database import db
-from backend.rabbitmq import rabbit_producer, rabbit_consumer
+from backend.rabbitmq import rabbit_consumer
+from backend.rabbitmq import rabbit_producer
 
 from models.transport import Transport
 from processing.api_key import new_api_key, get_api_key
@@ -82,7 +82,6 @@ def new_transport(name):
         # Return data
         log("transport:new_transport", "queue: {}".format(rabbit_consumer.queue))
         message = rabbit_consumer.queue.get(message_id)
-
         if message:
             log("transport:new_transport", "Got response from Core: {0}".format(message))
             message_dict = json.loads(message)

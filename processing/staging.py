@@ -3,21 +3,15 @@ from time import sleep
 from flask import json, request
 
 from models.agent import Agent
-from models.staging_message import StagingMessage
 from models.staging_response import StagingResponse
 
-from processing.agent import get_agent
-
-from backend.rabbitmq import rabbit_producer, rabbit_consumer
+from backend.rabbitmq import rabbit_consumer
+from backend.rabbitmq import rabbit_producer
 from logger import log
+
 
 def staging_message_json(staging_message):
     log("staging_message_json", "Working on %s" % staging_message)
-    tasks = []
-    # if staging_message.tasks:
-    #     for task in staging_message.tasks:
-    #         json_task = dict({'task_id': task.Id, 'agent_id': task.AgentId, 'command': task.Command, 'results': task.Results})
-    #         tasks.append(json_task)
     result = dict({
         'PayloadName': staging_message.PayloadName,
         'IV': staging_message.IV,
@@ -25,6 +19,7 @@ def staging_message_json(staging_message):
         'Message': staging_message.Message
     })
     return result
+
 
 def staging_response_json(staging_response):
     result = dict({
@@ -35,6 +30,7 @@ def staging_response_json(staging_response):
     })
     return result
 
+
 def staging_response_envelope(agentName, message):
     result = dict({
         'Success': True,
@@ -42,6 +38,7 @@ def staging_response_envelope(agentName, message):
         "Message": message
     })
     return result
+
 
 def get_staging_response(staging_id):
     response = None
