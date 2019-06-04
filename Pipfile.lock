@@ -405,17 +405,17 @@
         },
         "regex": {
             "hashes": [
-                "sha256:0ac2ba14f1e069507eec395140c0701045340f386a7ee7adb95961b3a2d821ef",
-                "sha256:3b90bfb577ba7ff2c25f74496096e8c2a92007b4c32108a7076d3b33a92ab357",
-                "sha256:455f29e0ad4a8002aed6a6c00c8054441dde03e25b1d622568afddb251439f14",
-                "sha256:6b957a06533fa7f070d339c1399fcc739d8b9b08f9d82c768e19bcf2b5cf5427",
-                "sha256:6fe1dd1d522062912e18d08f1ddd508431fdad7af2ebd80e035d74a1953e9e6a",
-                "sha256:7e3f1cbdd4d38dade6c880551fe7c2a2832635c743d9c8993785714615d7c08d",
-                "sha256:81f13830915fb3fe88d49e896a99a25eeb62dc1f3808c77bf3588fe8cdfcadc5",
-                "sha256:a5b17c52ce57657459162fb414f2ff8b85b7212921281ffe1ca63fb4105bee24",
-                "sha256:cc4dcdb1ee6fcb7d6a0b6eff4d86cb203b5b082719c94c88b7d7175c13691f92"
+                "sha256:0fd21bcff7115b5ab056c8b66d7ffc73f5542482708a59a174a43ac4285c50cf",
+                "sha256:1ca9f322d00ef5d3d28a61837909618931f9d6f5244251c95415a55fc5963aea",
+                "sha256:1f3a05f86b74de54d617d49183de060e225d6ada1e5ee7089c1b6c7b98d0c1f4",
+                "sha256:362563eb18aecde863e587e2f68ff01c72e9408f9e77b20114616a13e8ca039c",
+                "sha256:57e7fa3ed931cc9f10d239484b0e405f8988cc00de5489adeed7e816acb8653b",
+                "sha256:8f37e5a7e6e6f823da28c361419d5279e2ef9ef419fcbc5da217a028fd558f4b",
+                "sha256:95796000d83bfc6dbd8ad4c244fcfa5801ae1e0ac7c4893efff122b351ec0ee3",
+                "sha256:bebe83aadc01f307f0ec88c5a8a410543e5aab8b6838f32924ee74eb6f6e1415",
+                "sha256:d4fcb39dbdbd57f0470ca30e0af37f9f1f66a16f5920c59be95abeeb018a229d"
             ],
-            "version": "==2019.5.25"
+            "version": "==2019.6.2"
         },
         "shortuuid": {
             "hashes": [
@@ -434,10 +434,10 @@
         },
         "sqlalchemy": {
             "hashes": [
-                "sha256:91c54ca8345008fceaec987e10924bf07dcab36c442925357e5a467b36a38319"
+                "sha256:c7fef198b43ef31dfd783d094fd5ee435ce8717592e6784c45ba337254998017"
             ],
             "index": "pypi",
-            "version": "==1.3.3"
+            "version": "==1.3.4"
         },
         "tzlocal": {
             "hashes": [
