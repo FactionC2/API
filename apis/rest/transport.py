@@ -25,7 +25,7 @@ class TransportEndpoint(Resource):
     @authorized_groups(['StandardWrite'])
     def post(self):
         args = transport_parser.parse_args()
-        response = new_transport(transport_type=args['TransportType'])
+        response = new_transport(name=args['Name'])
         return jsonify(response)
 
     @authorized_groups(['StandardWrite', 'Transport'])
