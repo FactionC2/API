@@ -23,6 +23,7 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = DB_URI
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = SECRET_KEY
+
     # Even though we don't set a remember_me cookie, if anyone figured out how to create one it'd be bad news. We need
     # to make sure we won't accept a remember me cookie, so we set the name of the cookie we're looking for to
     # something random at startup. Probably a better way to do this, but this works for now.
@@ -37,29 +38,17 @@ def create_app():
     api = Api(prefix='/api/v1')
 
     # REST imports
-    log("app.py:CreateApp", "01")
     from apis.rest.agent import AgentEndpoint
-    log("app.py:CreateApp", "02")
     from apis.rest.agent_checkin import AgentCheckinEndpoint
-    log("app.py:CreateApp", "03")
     from apis.rest.agent_task import AgentTaskEndpoint
-    log("app.py:CreateApp", "04")
     from apis.rest.agent_type import AgentTypeEndpoint
-    log("app.py:CreateApp", "05")
     from apis.rest.console import ConsoleAgentEndpoint, ConsoleTaskEndpoint
-    log("app.py:CreateApp", "06")
     from apis.rest.error_message import ErrorMessageEndpoint
-    log("app.py:CreateApp", "07")
     from apis.rest.faction_file import FactionFileEndpoint, FactionFileDownloadEndpoint, FactionFileBytesEndpoint
-    log("app.py:CreateApp", "08")
     from apis.rest.ioc import IOCEndpoint
-    log("app.py:CreateApp", "09")
     from apis.rest.payload import PayloadEndpoint, PayloadFileEndpoint
-    log("app.py:CreateApp", "10")
     from apis.rest.staging import StagingEndpoint
-    log("app.py:CreateApp", "11")
     from apis.rest.transport import TransportEndpoint
-    log("app.py:CreateApp", "12")
     from apis.rest.user import LoginEndpoint, ChangePasswordEndpoint, ApiKeyEndpoint, UserEndpoint, \
         UserRoleEndpoint
 
@@ -129,5 +118,3 @@ def create_app():
 if __name__ == '__main__':
     log("app.py:main", "main starting...")
     socketio.run(create_app())
-# else:
-#     app = create_app()
