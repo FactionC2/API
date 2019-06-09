@@ -1,0 +1,11 @@
+trigger:
+- master
+- development
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- script: |
+    docker build .
+  displayName: 'Build Docker Image'
