@@ -1,13 +1,12 @@
-from datetime import datetime
-
-from flask import json
-from flask_socketio import SocketIO
-from backend.rabbitmq import rabbit_producer
-
 from models.agent import Agent
 from models.agent_task import AgentTask
+
+# We have to import AgentTaskUpdate here else SQLAlchemy gets very upset.
+from models.agent_task_update import AgentTaskUpdate
+
 from models.console_message import ConsoleMessage
 from models.user import User
+
 
 def agent_task_json(agent_task):
     updates = []
@@ -27,7 +26,8 @@ def agent_task_json(agent_task):
             "Received": update.Received.isoformat()
         })
     console_message = ConsoleMessage.query.filter_by(AgentTaskId=agent_task.Id).first()
-    if (console_message and console_message.UserId):
+
+    if console_message and console_message.UserId:
         user = (User.query.get(console_message.UserId)).Username
     else:
         user = "None"
@@ -47,6 +47,7 @@ def agent_task_json(agent_task):
         "Success": success
     }
     return result
+
 
 def get_agent_task(agent_task_id='all'):
     agent_tasks = []
