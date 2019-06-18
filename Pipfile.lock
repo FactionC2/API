@@ -26,11 +26,11 @@
         },
         "amqpstorm": {
             "hashes": [
-                "sha256:aefa31740c10eda48c6bdb506eba8a2b63723a159cf59e2506f1716f9edf0873",
-                "sha256:c70c71abf40e60a9d259aac6e58fdbbe306cdd90fd6ceb4830806c6b71e107dc"
+                "sha256:5ded1145089e5cfb2317bd32af9979dc9b08f15acae21bebf0b5c014c8e32f38",
+                "sha256:a2f26de4b458e6259701ceea87fec7767f6887a739260492aea5a06ce8f56cab"
             ],
             "index": "pypi",
-            "version": "==2.7.0"
+            "version": "==2.7.1"
         },
         "aniso8601": {
             "hashes": [
@@ -565,9 +565,9 @@
         },
         "wrapt": {
             "hashes": [
-                "sha256:4aea003270831cceb8a90ff27c4031da6ead7ec1886023b80ce0dfe0adf61533"
+                "sha256:565a021fd19419476b9362b05eeaa094178de64f8361e44468f9e9d7843901e1"
             ],
-            "version": "==1.11.1"
+            "version": "==1.11.2"
         }
     }
 }
