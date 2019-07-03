@@ -9,10 +9,10 @@ from logger import log
 def agent_checkin_json(agent_checkin):
     result = dict(
         {
-            'AgentId': agent_checkin.AgentId,
-            'IV': agent_checkin.IV,
-            'HMAC': agent_checkin.HMAC,
-            'Message': agent_checkin.Message
+            "AgentId": agent_checkin.AgentId,
+            "IV": agent_checkin.IV,
+            "HMAC": agent_checkin.HMAC,
+            "Message": agent_checkin.Message
          })
     return result
 
