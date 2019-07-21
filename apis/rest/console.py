@@ -24,10 +24,10 @@ class ConsoleAgentEndpoint(Resource):
         return jsonify(response)
 
     @authorized_groups(['StandardWrite'])
-    def post(self):
+    def post(self, agent_id):
         args = console_parser.parse_args()
         log("ConsoleEndpoint", "Got args: {}".format(args))
-        response = console_message.new_console_message(args.get("AgentId"), args.get("Content"))
+        response = console_message.new_console_message(agent_id, args.get("Content"))
         return jsonify(response)
     
 
