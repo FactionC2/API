@@ -74,7 +74,7 @@ class ChangePasswordEndpoint(Resource):
 
 class ApiKeyEndpoint(Resource):
     @authorized_groups(['StandardRead'])
-    def get(self, user_id):
+    def get(self, user_id, api_key_id=None):
         if current_user.Id == user_id:
             return jsonify(current_user.get_api_keys())
         else:
@@ -84,7 +84,7 @@ class ApiKeyEndpoint(Resource):
             }, 400)
 
     @authorized_groups(['StandardRead'])
-    def post(self, user_id):
+    def post(self, user_id, api_key_id=None):
         if current_user.Id == user_id:
             return jsonify(new_api_key("Access", user_id))
         else:

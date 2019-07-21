@@ -1,0 +1,31 @@
+trigger:
+- master
+- development
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- script: |
+    docker build .
+  displayName: 'Build Docker Image'
+
+- task: Docker@2
+  displayName: 'Build Docker Image and Push to Docker Hub (Master)'
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  inputs:
+    containerRegistry: 'Docker Hub - Faction'
+    repository: 'faction/api'
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
+    tags: 'latest'
+
+- task: Docker@2
+  displayName: 'Build Docker Image and Push to Docker Hub (Development)'
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/development'))
+  inputs:
+    containerRegistry: 'Docker Hub - Faction'
+    repository: 'faction/api'
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
+    tags: 'dev'

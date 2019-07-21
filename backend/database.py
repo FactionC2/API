@@ -18,4 +18,5 @@ while not db_connected:
         db_connected = False
         sleep(5)
 
+log("database.py", "Configuring DB object..")
 db = SQLAlchemy()

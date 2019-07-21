@@ -41,10 +41,10 @@ class TransportEndpoint(Resource):
                                     visible=args['Visible'])
         return jsonify(response)
 
-    @authorized_groups(['StandardWrite', 'Transport'])
+    @authorized_groups(['StandardWrite'])
     def delete(self, transport_id):
         args = transport_parser.parse_args()
-        log("transportEndpoint", "::put got args: {0}".format(args))
+        log("transportEndpoint", "::delete got args: {0}".format(args))
         response = update_transport(transport_id=transport_id,
                                     enabled=False,
                                     visible=False)

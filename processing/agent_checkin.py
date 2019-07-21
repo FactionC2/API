@@ -1,27 +1,21 @@
 from base64 import b64decode
-from datetime import datetime
-
 from flask import json, request
-from flask_socketio import SocketIO
 from backend.rabbitmq import rabbit_producer
-from models.agent import Agent
 from models.agent_checkin import AgentCheckin
-from models.agent_task_update import AgentTaskUpdate
 from processing import agent_task_message
 from logger import log
-
-socketio = SocketIO()
 
 
 def agent_checkin_json(agent_checkin):
     result = dict(
         {
-            'AgentId' : agent_checkin.AgentId,
-            'IV': agent_checkin.IV,
-            'HMAC': agent_checkin.HMAC,
-            'Message' : agent_checkin.Message
+            "AgentId": agent_checkin.AgentId,
+            "IV": agent_checkin.IV,
+            "HMAC": agent_checkin.HMAC,
+            "Message": agent_checkin.Message
          })
     return result
+
 
 def get_agent_checkin(agent_checkin_id='all'):
     if agent_checkin_id == 'all':
@@ -62,7 +56,6 @@ def add_agent_checkin(agent_name, transport_id=None, source_ip=None, message=Non
     }
 
     log("add_agent_task_response", "publishing?")
-    #publish_message('Core', 'AgentCheckin', json_string)
     rabbit_producer.send_request('NewAgentCheckin', checkin)
     return {
         'Success': True,

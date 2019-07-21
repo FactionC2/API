@@ -4,14 +4,16 @@ from time import sleep
 from datetime import datetime
 from secrets import token_urlsafe
 
-from flask import json, request, send_from_directory
+from flask import json, request
 from itsdangerous import URLSafeSerializer
 from werkzeug.utils import secure_filename
 
 from processing.error_message import create_error_message
 
 from backend.database import db
-from backend.rabbitmq import rabbit_producer, rabbit_consumer
+
+from backend.rabbitmq import rabbit_consumer
+from backend.rabbitmq import rabbit_producer
 
 from config import UPLOAD_DIR, SECRET_KEY
 from models.payload import Payload

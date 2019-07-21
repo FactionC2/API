@@ -1,6 +1,6 @@
 from flask import jsonify, request
 from flask_restful import Resource, fields, reqparse
-from processing import agent, agent_checkin
+from processing import agent
 from processing.user_role import authorized_groups
 
 task_fields = {

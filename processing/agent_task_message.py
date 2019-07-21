@@ -12,10 +12,10 @@ def agent_task_message_json(task_message):
     agent = Agent.query.get(task_message.AgentId)
     result = dict(
         {
-            'AgentName' : agent.Name,
-            'IV': task_message.IV,
-            'HMAC': task_message.HMAC,
-            'Message' : task_message.Message
+            "AgentName" : agent.Name,
+            "IV": task_message.IV,
+            "HMAC": task_message.HMAC,
+            "Message" : task_message.Message
          })
     return result
 

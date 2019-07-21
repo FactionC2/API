@@ -1,13 +1,7 @@
-from datetime import datetime
-
-from flask import json
-from flask_socketio import SocketIO
-from backend.rabbitmq import rabbit_producer
-
-from models.agent import Agent
 from models.ioc import IOC
 from models.user import User
 from models.console_message import ConsoleMessage
+
 
 def ioc_json(ioc):
     if (ioc.UserId):
@@ -48,6 +42,7 @@ def ioc_json(ioc):
         "Username": username
     }
     return result
+
 
 def get_ioc(ioc_id='all'):
     iocs = []
