@@ -49,9 +49,6 @@ def get_staging_response(staging_id):
         response_json = staging_message_json(response)
         results = []
         results.append(response_json)
-        encoded_message = b64encode(str(results).encode('utf-8'))
-        staging_envelope = staging_response_envelope(agent.Name, encoded_message)
-
         return results
     return dict({
         "Success":False,

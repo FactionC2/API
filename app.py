@@ -63,7 +63,7 @@ def create_app():
     api.add_resource(LoginEndpoint, '/login/')
     api.add_resource(UserEndpoint, '/user/', '/user/<int:user_id>/')
     api.add_resource(ChangePasswordEndpoint, '/user/<int:user_id>/password/')
-    api.add_resource(ApiKeyEndpoint, '/user/<int:user_id>/apikeys/', '/user/<int:user_id>/apikeys/<int:api_key_id>/')
+    api.add_resource(ApiKeyEndpoint, '/user/<int:user_id>/apikey/', '/user/<int:user_id>/apikey/<int:api_key_id>/')
     api.add_resource(UserRoleEndpoint, '/user/role/', '/user/role/<int:user_role_id>/')
 
     # Task REST endpoints
