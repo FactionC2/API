@@ -378,11 +378,11 @@
         },
         "python-engineio": {
             "hashes": [
-                "sha256:32f2458431c2492c8ab90d49ef60a7230b11da9ee5a3dcaa7f5a6d0302d22e33",
-                "sha256:96bb808dd5933b540cfc65f8f67d66e0bcb1f28e73e878bc9bcf6de27e3f2835"
+                "sha256:664cbd716a62f010a503ba4f3e668fe5861d6f73e38ad026da9d9a637b7460ec",
+                "sha256:c079867620a9b880bcd52d664aea4fea88ba839af73a5e50a4f497b14b697956"
             ],
             "index": "pypi",
-            "version": "==3.8.2"
+            "version": "==3.9.0"
         },
         "python-socketio": {
             "hashes": [
