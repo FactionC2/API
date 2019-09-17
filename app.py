@@ -114,6 +114,8 @@ def create_app():
     log("app.py:CreateApp", "Finished.")
     return app
 
+app = create_app()
+
 
 if __name__ == '__main__':
     log("app.py:main", "main starting...")
