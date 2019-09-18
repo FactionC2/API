@@ -1,6 +1,4 @@
 from models.agent import Agent
-from models.staging_message import StagingMessage
-from backend.database import db
 from backend.rabbitmq import rabbit_producer
 from logger import log
 

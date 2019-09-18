@@ -2,8 +2,8 @@ import os
 import json
 from logger import log
 
-
 config_file_path = '/opt/faction/global/config.json'
+
 
 def get_config():
     try:
@@ -27,17 +27,13 @@ def get_config():
         log("config.py", "Could not load config file: {0}".format(config_file_path))
         exit(1)
 
-FACTION_CONFIG = get_config()
 
+FACTION_CONFIG = get_config()
 SECRET_KEY = FACTION_CONFIG["FLASK_SECRET"]
-#SALT = '<THIS SHOULD ALSO BE CHANGED>'
-#ADMIN_USERNAME = 'admin'
-#ADMIN_PASSWORD = 'FactionRocksSocks' # Faction does indeed rock socks, but you change this
 RABBIT_HOST = FACTION_CONFIG["RABBIT_HOST"]
 RABBIT_USERNAME = FACTION_CONFIG["RABBIT_USERNAME"]
 RABBIT_PASSWORD = FACTION_CONFIG["RABBIT_PASSWORD"]
 RABBIT_URL = 'amqp://{}:{}@{}:5672/%2F'.format(RABBIT_USERNAME, RABBIT_PASSWORD, RABBIT_HOST)
-#RABBIT_HOST = '192.168.1.49'
 DB_USER = FACTION_CONFIG["POSTGRES_USERNAME"]
 DB_PASSWORD = FACTION_CONFIG["POSTGRES_PASSWORD"]
 DB_HOST = FACTION_CONFIG["POSTGRES_HOST"]
