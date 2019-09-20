@@ -1,4 +1,5 @@
 from models.agent import Agent
+from processing.command import get_commands_by_agent_id
 from backend.rabbitmq import rabbit_producer
 from logger import log
 
@@ -17,6 +18,8 @@ def agent_json(agent):
         "TransportType": agent.Transport.TransportType
     })
 
+    commands = get_commands_by_agent_id(agent.Id)
+
     result = {
         'Id': agent.Id,
         'Name': agent.Name,
@@ -31,7 +34,8 @@ def agent_json(agent):
         'LastCheckin': agent.LastCheckin.isoformat(),
         'InternalIP': agent.InternalIP,
         'ExternalIP': agent.ExternalIP,
-        'Visible': agent.Visible
+        'Visible': agent.Visible,
+        'Commands': commands
     }
     return result
 

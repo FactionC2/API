@@ -1,4 +1,5 @@
 from backend.database import db
+from models.command_parameter import CommandParameter
 
 
 class Command(db.Model):
@@ -10,3 +11,4 @@ class Command(db.Model):
     MitreReference = db.Column(db.String)
     OpsecSafe = db.Column(db.Boolean)
     ModuleId = db.Column(db.Integer, db.ForeignKey('Module.Id'))
+    Parameters = db.relationship('CommandParameter', backref='Command', lazy=True)
