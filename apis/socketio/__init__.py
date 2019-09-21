@@ -76,8 +76,9 @@ def hide_agent(data):
 @socketio.on('getAgentCommands')
 @authorized_groups(['StandardRead'])
 def get_agent_commands(data):
-    print('Request for Agent {} commands'.format(data['AgentId']))
+    print('[socketio:getAgentCommands] Request for Agent {} commands'.format(data['AgentId']))
     response = command.get_commands_by_agent_id(data['AgentId'])
+    print('[socketio:getAgentCommands] Sending {} commands in response'.format(len(response)))
     emit('getAgentCommands', response)
 
 
