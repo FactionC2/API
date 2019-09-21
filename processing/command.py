@@ -1,6 +1,21 @@
 from models.agent import Agent
 from models.command import Command
 
+FACTION_COMMANDS = [
+    {
+        "Id": 1,
+        "Name": "help",
+        "Description": "Get help with Faction commands",
+        "Parameters": []
+    },
+    {
+        "Id": 2,
+        "Name": "show",
+        "Description": "Show available modules and commands",
+        "Parameters": []
+    }
+]
+
 
 def command_json(command):
     parameters = []
@@ -28,9 +43,13 @@ def command_json(command):
 
 def get_commands_by_agent_id(agent_id):
     agent = Agent.query.get(agent_id)
-    results = []
+
+    results = FACTION_COMMANDS
+    for command in agent.AgentType.Commands:
+        results.append(command_json(command))
     for module in agent.AvailableModules:
         commands = Command.query.filter_by(ModuleId=module.Id)
         for command in commands:
             results.append(command_json(command))
+
     return results

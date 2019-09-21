@@ -11,4 +11,5 @@ class Command(db.Model):
     MitreReference = db.Column(db.String)
     OpsecSafe = db.Column(db.Boolean)
     ModuleId = db.Column(db.Integer, db.ForeignKey('Module.Id'))
+    AgentTypeId = db.Column(db.Integer, db.ForeignKey('AgentType.Id'))
     Parameters = db.relationship('CommandParameter', backref='Command', lazy=True)

@@ -39,6 +39,7 @@ def create_app():
 
     # REST imports
     from apis.rest.agent import AgentEndpoint
+    from apis.rest.agent_commands import AgentCommandEndpoint
     from apis.rest.agent_checkin import AgentCheckinEndpoint
     from apis.rest.agent_task import AgentTaskEndpoint
     from apis.rest.agent_type import AgentTypeEndpoint
@@ -58,6 +59,7 @@ def create_app():
     api.add_resource(AgentCheckinEndpoint, '/agent/<string:agent_name>/checkin/')
     api.add_resource(AgentTypeEndpoint, '/agent/type/', '/agent/type/<int:agent_type_id>/')
     api.add_resource(ConsoleAgentEndpoint, '/agent/<int:agent_id>/console/')
+    api.add_resource(AgentCommandEndpoint, '/agent/<int:agent_id>/commands/')
 
     # User REST endpoints
     api.add_resource(LoginEndpoint, '/login/')
