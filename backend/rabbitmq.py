@@ -61,6 +61,7 @@ class Consumer(object):
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='AgentCheckinAnnouncement')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='ConsoleMessageAnnouncement')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='AgentUpdated')
+        self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='AgentCommandsUpdated')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='ErrorMessageAnnouncement')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='NewFactionFile')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='PayloadUpdate')
@@ -131,6 +132,12 @@ class Consumer(object):
                 agentUpdated = json.loads(message.body)
                 log("rabbitmq-consumer:_on_response", "Publishing message: {0}".format(str(agentUpdated)))
                 self.socketio.emit('agentUpdated', agentUpdated)
+
+            elif message.properties['message_type'] == 'AgentCommandsUpdated':
+                log("rabbitmq-consumer:_on_response", "Got AgentCommandsUpdated at {0}".format(message.timestamp))
+                agentCommandsUpdated = json.loads(message.body)
+                log("rabbitmq-consumer:_on_response", "Publishing message: {0}".format(str(agentCommandsUpdated)))
+                self.socketio.emit('agentCommandsUpdated', agentCommandsUpdated, room=agentCommandsUpdated["AgentId"])
 
             elif message.properties['message_type'] == 'ConsoleMessageAnnouncement':
                 log("rabbitmq-consumer:_on_response", "Got ConsoleMessageAnnouncement")

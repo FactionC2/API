@@ -1,5 +1,6 @@
 from backend.database import db
 from models.transport import Transport
+from models.module import Module
 from models.agent_type import AgentType
 from models.agent_task import AgentTask
 
@@ -7,6 +8,12 @@ AgentsTransportsXREF = db.Table('AgentsTransportsXREF',
     db.Column('AgentId', db.Integer, db.ForeignKey('Agent.Id'), primary_key=True),
     db.Column('TransportId', db.Integer, db.ForeignKey('Transport.Id'), primary_key=True)
 )
+
+AgentModulesXREF = db.Table('AgentModulesXREF',
+    db.Column('AgentId', db.Integer, db.ForeignKey('Agent.Id'), primary_key=True),
+    db.Column('ModuleId', db.Integer, db.ForeignKey('Module.Id'), primary_key=True)
+)
+
 
 class Agent(db.Model):
     __tablename__ = "Agent"
@@ -32,6 +39,7 @@ class Agent(db.Model):
     Tasks = db.relationship('AgentTask', backref='Agent', lazy=True)
     ConsoleMessages = db.relationship("ConsoleMessage", backref='Agent', lazy=True)
     AvailableTransports = db.relationship('Transport', secondary=AgentsTransportsXREF, lazy='subquery', backref=db.backref('AvailableAgents', lazy=True))
+    AvailableModules = db.relationship('Module', secondary=AgentModulesXREF, lazy='subquery', backref=db.backref('AvailableAgents', lazy=True))
     Visible = db.Column(db.Boolean)
 
     def __repr__(self):

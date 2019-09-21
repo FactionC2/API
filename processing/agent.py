@@ -1,4 +1,5 @@
 from models.agent import Agent
+from processing.command import get_commands_by_agent_id
 from backend.rabbitmq import rabbit_producer
 from logger import log
 

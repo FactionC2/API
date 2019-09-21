@@ -6,6 +6,7 @@ from models.agent_type_operating_system import AgentTypeOperatingSystem
 from models.agent_type_version import AgentTypeVersion
 from models.agent_transport_type import AgentTransportType
 
+
 class AgentType(db.Model):
     __tablename__ = "AgentType"
     Id = db.Column(db.Integer, primary_key=True)
@@ -18,6 +19,7 @@ class AgentType(db.Model):
     AgentTypeOperatingSystems = db.relationship('AgentTypeOperatingSystem', backref='AgentType', lazy=True)
     AgentTypeVersions = db.relationship('AgentTypeVersion', backref='AgentType', lazy=True)
     Payloads = db.relationship('Payload', backref='AgentType', lazy=True)
+    Commands = db.relationship('Command', backref='AgentType', lazy=True)
     Name = db.Column(db.String)
     Guid = db.Column(db.String)
 
