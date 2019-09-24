@@ -39,6 +39,7 @@ def create_app():
 
     # REST imports
     from apis.rest.agent import AgentEndpoint
+    from apis.rest.agent_commands import AgentCommandEndpoint
     from apis.rest.agent_checkin import AgentCheckinEndpoint
     from apis.rest.agent_task import AgentTaskEndpoint
     from apis.rest.agent_type import AgentTypeEndpoint
@@ -58,6 +59,7 @@ def create_app():
     api.add_resource(AgentCheckinEndpoint, '/agent/<string:agent_name>/checkin/')
     api.add_resource(AgentTypeEndpoint, '/agent/type/', '/agent/type/<int:agent_type_id>/')
     api.add_resource(ConsoleAgentEndpoint, '/agent/<int:agent_id>/console/')
+    api.add_resource(AgentCommandEndpoint, '/agent/<int:agent_id>/commands/')
 
     # User REST endpoints
     api.add_resource(LoginEndpoint, '/login/')
@@ -102,7 +104,9 @@ def create_app():
     app.session_interface = ApiSessionInterface()
 
     log("app.py:CreateApp", "Setting up socketio..")
-    socketio.init_app(app, host='0.0.0.0', manage_session=False, message_queue=RABBIT_URL, channel="ConsoleMessages")
+    # You can add extra logging around socketio by setting the following options here: logger=True, engineio_logger=True
+    socketio.init_app(app, host='0.0.0.0', manage_session=False, message_queue=RABBIT_URL, channel="ConsoleMessages",
+                      cors_allowed_origins="*")
 
     from backend.rabbitmq import rabbit_consumer
     rabbit_consumer.socketio = socketio
@@ -114,8 +118,8 @@ def create_app():
     log("app.py:CreateApp", "Finished.")
     return app
 
-app = create_app()
 
+app = create_app()
 
 if __name__ == '__main__':
     log("app.py:main", "main starting...")

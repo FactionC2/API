@@ -2,7 +2,7 @@ from flask_socketio import SocketIO, emit, join_room
 from flask_login import current_user, login_required
 
 from processing.user_role import authorized_groups
-from processing import agent, agent_checkin, agent_task, console_message, \
+from processing import agent, agent_checkin, agent_task, command, console_message, \
     error_message, faction_file, ioc, payload, transport
 from processing.user import logout_faction_user
 from logger import log
@@ -56,6 +56,7 @@ def join_agent(data):
     print('emitting..')
     emit('joinAgent', 'Joined room.', room=data['AgentId'])
 
+
 @socketio.on('updateAgent')
 @authorized_groups(['StandardWrite'])
 def update_agent(data):
@@ -63,12 +64,22 @@ def update_agent(data):
     print('Agent ' + str(data['AgentId']) + ' updated')
     emit('updateAgent', response, broadcast=True)
 
+
 @socketio.on('hideAgent')
 @authorized_groups(['StandardWrite'])
-def join_agent(data):
+def hide_agent(data):
     response = agent.update_agent(data['AgentId'], visible=False)
     print('Agent ' + str(data['AgentId']) + ' updated')
     emit('updateAgent', response, broadcast=True)
+
+
+@socketio.on('getAgentCommands')
+@authorized_groups(['StandardRead'])
+def get_agent_commands(data):
+    print('[socketio:getAgentCommands] Request for Agent {} commands'.format(data['AgentId']))
+    response = command.get_commands_by_agent_id(data['AgentId'])
+    print('[socketio:getAgentCommands] Sending {} commands in response'.format(len(response)))
+    emit('getAgentCommands', response)
 
 
 ### AGENT_CHECKIN API ####
@@ -88,6 +99,7 @@ def get_message(data):
     message_obj = console_message.get_console_message(data)
     emit('getMessage', message_obj, room=data['AgentId'])
 
+
 @socketio.on('getTaskMessage')
 @authorized_groups(['StandardRead'])
 def get_message(data):
@@ -102,6 +114,7 @@ def new_message(data):
     log("socketio:new_message", "Got new message.. {}".format(data))
     console_message.new_console_message(data["AgentId"], data["Content"])
 
+
 ### ERROR MESSAGE API ###
 @socketio.on('getErrorMessage')
 @authorized_groups(['StandardRead'])
@@ -111,6 +124,7 @@ def get_error_message(data):
     log("socketio:get_error_message", "getting error message: {}".format(data))
     emit('getErrorMessage', error_messages)
 
+
 ### FILES API ###
 @socketio.on('getFile')
 @authorized_groups(['StandardRead'])
@@ -119,6 +133,7 @@ def get_faction_file(data):
     file_obj = faction_file.get_faction_file(data.get('Filename'))
     emit('getFile', file_obj)
 
+
 ### IOCs API ###
 @socketio.on('getIOC')
 @authorized_groups(['StandardRead'])
@@ -126,6 +141,7 @@ def get_message(data):
     log("getIOC", "getting ioc: {}".format(data))
     ioc_obj = ioc.get_ioc(data['IocId'])
     emit('getIOC', ioc_obj)
+
 
 ### PAYLOADS API ###
 @socketio.on('getPayload')
@@ -141,18 +157,18 @@ def get_payload(data):
 def new_payload(data):
     log("socketio:new_payload", "req received")
 
-    resp = payload.new_payload(description = data.get('Description'),
-                               agent_type = data.get('AgentType'),
-                               agent_transport_id = data.get('AgentTransportId'),
+    resp = payload.new_payload(description=data.get('Description'),
+                               agent_type=data.get('AgentType'),
+                               agent_transport_id=data.get('AgentTransportId'),
                                transport_id=data.get('TransportId'),
                                operating_system=data.get('OperatingSystemId'),
                                architecture=data.get('ArchitectureId'),
                                version=data.get('VersionId'),
                                format=data.get('FormatId'),
                                agent_type_configuration=data.get('AgentTypeConfigurationId'),
-                               jitter = data.get('Jitter'),
-                               interval = data.get('BeaconInterval'),
-                               expiration_date = data.get('ExpirationDate'),
+                               jitter=data.get('Jitter'),
+                               interval=data.get('BeaconInterval'),
+                               expiration_date=data.get('ExpirationDate'),
                                debug=data.get('Debug'))
     emit('newPayload', resp, broadcast=True)
 
@@ -172,6 +188,7 @@ def update_payload(data):
     print(resp)
     emit('payloadUpdated', resp, broadcast=True)
 
+
 @socketio.on('hidePayload')
 @authorized_groups(['StandardWrite'])
 def update_payload(data):
@@ -183,6 +200,7 @@ def update_payload(data):
         visible=False
     )
     emit('payloadUpdated', resp, broadcast=True)
+
 
 ### TASKS API ###
 @socketio.on('getTask')
@@ -201,12 +219,14 @@ def get_transport(data):
     transport_obj = transport.get_transport(data.get('TransportId'), include_hidden=data.get('IncludeHidden'))
     emit('getTransport', transport_obj)
 
+
 @socketio.on('newTransport')
 @authorized_groups(['StandardWrite'])
 def new_transport(data):
     log("socketio:new_transport", "req received")
     resp = transport.new_transport(name=data.get('Name'))
     emit('transportCreated', resp)
+
 
 @socketio.on('updateTransport')
 @authorized_groups(['StandardWrite', 'Transport'])
@@ -215,13 +235,14 @@ def update_transport(data):
     log("socketio:update_transport", "id: {0}".format(data.get('TransportId')))
     log("socketio:update_transport", "Enabled: {0}".format(data.get('Enabled')))
     response = transport.update_transport(transport_id=data.get('TransportId'),
-                                        name=data.get('Name'),
-                                        description=data.get('Description'),
-                                        guid=data.get('Guid'),
-                                        configuration=data.get('Configuration'),
-                                        enabled=data.get('Enabled'),
-                                        visible=data.get('Visible'))
+                                          name=data.get('Name'),
+                                          description=data.get('Description'),
+                                          guid=data.get('Guid'),
+                                          configuration=data.get('Configuration'),
+                                          enabled=data.get('Enabled'),
+                                          visible=data.get('Visible'))
     emit('transportUpdated', response, broadcast=True)
+
 
 @socketio.on('hideTransport')
 @authorized_groups(['StandardWrite'])
@@ -230,9 +251,10 @@ def update_transport(data):
     log("socketio:update_transport", "id: {0}".format(data.get('TransportId')))
     log("socketio:update_transport", "Enabled: {0}".format(data.get('Enabled')))
     response = transport.update_transport(transport_id=data.get('TransportId'),
-                                        enabled=False,
-                                        visible=False)
+                                          enabled=False,
+                                          visible=False)
     emit('transportUpdated', response, broadcast=True)
+
 
 @socketio.on('logout')
 @authorized_groups(['StandardRead'])

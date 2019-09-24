@@ -1,4 +1,6 @@
 from backend.database import db
+from models.staging_message import StagingMessage
+
 
 class Payload(db.Model):
     __tablename__ = "Payload"
