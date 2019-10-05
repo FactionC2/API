@@ -5,8 +5,8 @@ from os import environ
 default_level = logging.INFO
 
 def log(source, message, level="info"):
-    msg = f"[{source}] - {message}"
-    
+    msg = f"[{str(source)}] - {str(message)}"
+
     if int(environ.get("USE_NATIVE_LOGGER", 0)) == 1:
         if not isinstance(level, int):
             level = getattr(logging, level.upper(), default_level)
