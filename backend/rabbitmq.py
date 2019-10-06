@@ -38,8 +38,9 @@ class Consumer(object):
                 rabbit_connected = True
                 log("rabbitmq-consumer:open", "RabbitMQ is up!")
                 connection.close()
-            except:
+            except Exception as e:
                 rabbit_connected = False
+                log("rabbitmq-consumer:open", f"Connection Error: {str(e)}")
                 log("rabbitmq-consumer:open", "RabbitMQ not reachable.. waiting..")
                 sleep(2)
 
