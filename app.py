@@ -1,4 +1,7 @@
+#!/usr/bin/env python3
+
 import os
+import sys
 import secrets
 from logger import log
 import eventlet
@@ -104,8 +107,11 @@ def create_app():
     app.session_interface = ApiSessionInterface()
 
     log("app.py:CreateApp", "Setting up socketio..")
+    # startup.sh will default to 0.0.0.0 for docker containers
+    host = os.environ.get("GUNICORN_BIND_ADDRESS", "127.0.0.1")
+    port = int(os.environ.get("GUNICORN_BIND_PORT", 5000))
     # You can add extra logging around socketio by setting the following options here: logger=True, engineio_logger=True
-    socketio.init_app(app, host='0.0.0.0', manage_session=False, message_queue=RABBIT_URL, channel="ConsoleMessages",
+    socketio.init_app(app, host=host, port=port, async_mode='eventlet', manage_session=False, message_queue=RABBIT_URL, channel="ConsoleMessages",
                       cors_allowed_origins="*")
 
     from backend.rabbitmq import rabbit_consumer
@@ -123,4 +129,22 @@ app = create_app()
 
 if __name__ == '__main__':
     log("app.py:main", "main starting...")
-    socketio.run(create_app())
+    host = os.environ.get("GUNICORN_BIND_ADDRESS", "127.0.0.1")
+    port = int(os.environ.get("GUNICORN_BIND_PORT", 5000))
+    is_debug = int(os.environ.get("GUNICORN_DEBUG", 0)) == 1
+    is_reloading = int(os.environ.get("GUNICORN_RELOAD", 0)) == 1
+    log("app.py:main", f"Binding on {str(host)}:{str(port)}")
+    log("app.py:main", f"SocketIO Mode is {str(socketio.server.eio.async_mode)}")
+    if is_debug:
+        log("app.py:main", "Debug Mode Enabled")
+    if is_reloading:
+        log("app.py:main", "Reloading Enabled")
+
+    socketio.run(
+        app, 
+        host=host, 
+        port=port, 
+        debug=is_debug, 
+        use_reloader=is_reloading, 
+        log_output=True
+    )
