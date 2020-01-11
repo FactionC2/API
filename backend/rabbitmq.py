@@ -6,6 +6,8 @@ from amqpstorm import Message
 from config import RABBIT_HOST, RABBIT_USERNAME, RABBIT_PASSWORD
 from logger import log
 
+from processing.payload import payload_json
+
 
 class Consumer(object):
     """Asynchronous Rpc client."""
@@ -66,7 +68,7 @@ class Consumer(object):
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='ErrorMessageAnnouncement')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='NewFactionFile')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='NewAgent')
-        # self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='PayloadUpdate')
+        self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='PayloadCreated')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='PayloadUpdated')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='TransportCreated')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='TransportUpdated')
@@ -183,12 +185,12 @@ class Consumer(object):
                 log("rabbitmq-consumer:_on_response", "Publishing message: {0}".format(str(agent)))
                 self.socketio.emit('newAgent', agent, broadcast=True)
 
-
-            # elif message.properties['message_type'] == 'PayloadUpdate':
-            #     log("rabbitmq-consumer:_on_response", "Got PayloadUpdate")
-            #     payloadUpdateMessage = json.loads(message.body)
-            #     log("rabbitmq-consumer:_on_response", "Emitting: {0}".format(message.body))
-            #     self.socketio.emit('updatePayload', payloadUpdateMessage)
+            # PAYLOAD CREATED
+            elif message.properties['message_type'] == 'PayloadCreated':
+                log("rabbitmq-consumer:_on_response", "Got PayloadCreated")
+                payloadMessage = json.loads(message.body)
+                log("rabbitmq-consumer:_on_response", "Emitting: {0}".format(message.body))
+                self.socketio.emit('payloadCreated', payloadMessage)
 
             # PAYLOAD UPDATED
             elif message.properties['message_type'] == 'PayloadUpdated':
