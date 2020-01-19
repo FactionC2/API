@@ -1,6 +1,7 @@
 from backend.rabbitmq import rabbit_producer
 from models.error_message import ErrorMessage
 
+
 def error_message_json(error_message):
     return {
         "Id": error_message.Id,

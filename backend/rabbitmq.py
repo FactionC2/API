@@ -6,8 +6,6 @@ from amqpstorm import Message
 from config import RABBIT_HOST, RABBIT_USERNAME, RABBIT_PASSWORD
 from logger import log
 
-from processing.payload import payload_json
-
 
 class Consumer(object):
     """Asynchronous Rpc client."""
@@ -154,7 +152,7 @@ class Consumer(object):
                 log("rabbitmq-consumer:_on_response", "Got DevPayloadCreated at {0}".format(message.timestamp))
                 devPayloadComplete = json.loads(message.body)
                 log("rabbitmq-consumer:_on_response", "Publishing message: {0}".format(str(devPayloadComplete)))
-                self.socketio.emit('buildComplete', devPayloadComplete)
+                self.socketio.emit('devPayloadCreated', devPayloadComplete)
 
             # ERROR MESSAGE ANNOUNCEMENT
             elif message.properties['message_type'] == 'ErrorMessageAnnouncement':
