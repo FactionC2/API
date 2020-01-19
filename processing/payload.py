@@ -193,33 +193,33 @@ def new_payload(description,
     })
 
     log("payload:new_payload", "Publishing: {0}".format(publish_message))
-    message_id = rabbit_producer.send_request("NewPayload", publish_message, callback=True)
-
-    # Wait for our response
-    # TODO: Add actual timeout here.
-    i = 0
-    while rabbit_consumer.queue[message_id] is None and i < 15:
-        log("payload:new_payload", "Waiting for {0} seconds".format(15 - i))
-        sleep(1)
-        i += 1
-
-    # Return data
-    message = rabbit_consumer.queue[message_id]
-
-    if message:
-        log("payload:new_payload", "Got response from Build Server: {0}".format(message))
-        message_dict = json.loads(message)
-        if message_dict.get('Source'):
-            log("payload:new_payload", "Its an error..")
-            return message_dict
-        else:
-            payload = Payload.query.get(message_dict['Id'])
-            return {
-                "Success": True,
-                "Result": payload_json(payload)
-            }
-    log("payload:new_payload", "Timed out.")
-    return create_error_message("Timeout waiting for response from Core while processing new payload")
+    message_id = rabbit_producer.send_request("NewPayload", publish_message)
+    #
+    # # Wait for our response
+    # # TODO: Add actual timeout here.
+    # i = 0
+    # while rabbit_consumer.queue[message_id] is None and i < 15:
+    #     log("payload:new_payload", "Waiting for {0} seconds".format(15 - i))
+    #     sleep(1)
+    #     i += 1
+    #
+    # # Return data
+    # message = rabbit_consumer.queue[message_id]
+    #
+    # if message:
+    #     log("payload:new_payload", "Got response from Build Server: {0}".format(message))
+    #     message_dict = json.loads(message)
+    #     if message_dict.get('Source'):
+    #         log("payload:new_payload", "Its an error..")
+    #         return message_dict
+    #     else:
+    #         payload = Payload.query.get(message_dict['Id'])
+    #         return {
+    #             "Success": True,
+    #             "Result": payload_json(payload)
+    #         }
+    # log("payload:new_payload", "Timed out.")
+    # return create_error_message("Timeout waiting for response from Core while processing new payload")
 
 
 def update_payload(payload_id, enabled=None, jitter=None, interval=None, visible=None, expiration_date=None):

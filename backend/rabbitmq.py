@@ -57,15 +57,16 @@ class Consumer(object):
         # Create the APIService queue
         log('rabbitmq-consumer:open', 'Creating queue:  {0}'.format(self.rpc_queue))
         self.channel.queue.declare(self.rpc_queue, durable=True, exclusive=False, auto_delete=False, arguments=None)
-        self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='NewAgent')
-        self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='AgentTaskUpdate')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='AgentCheckinAnnouncement')
-        self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='ConsoleMessageAnnouncement')
-        self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='AgentUpdated')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='AgentCommandsUpdated')
+        self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='AgentTaskUpdate')
+        self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='AgentUpdated')
+        self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='ConsoleMessageAnnouncement')
+        self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='DevPayloadCreated')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='ErrorMessageAnnouncement')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='NewFactionFile')
-        self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='PayloadUpdate')
+        self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='NewAgent')
+        self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='PayloadCreated')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='PayloadUpdated')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='TransportCreated')
         self.channel.queue.bind(self.rpc_queue, exchange='Core', routing_key='TransportUpdated')
@@ -115,31 +116,28 @@ class Consumer(object):
                 log('rabbitmq-consumer:_on_response', 'Got a response to one of our messages. Updating queue.')
                 self.queue[message.correlation_id] = message.body
 
-            elif message.properties['message_type'] == 'NewAgent':
-                log("rabbitmq-consumer:_on_response", "Got NewAgent at {0}".format(message.timestamp))
-                agent = json.loads(message.body)
-                agent['Success'] = True
-                log("rabbitmq-consumer:_on_response", "Publishing message: {0}".format(str(agent)))
-                self.socketio.emit('newAgent', agent, broadcast=True)
-
+            # AGENT CHECKIN ANNOUNCEMENT
             elif message.properties['message_type'] == 'AgentCheckinAnnouncement':
                 log("rabbitmq-consumer:_on_response", "Got AgentCheckinAnnouncement at {0}".format(message.timestamp))
                 agentCheckin = json.loads(message.body)
                 log("rabbitmq-consumer:_on_response", "Publishing message: {0}".format(str(agentCheckin)))
                 self.socketio.emit('agentCheckin', agentCheckin)
 
-            elif message.properties['message_type'] == 'AgentUpdated':
-                log("rabbitmq-consumer:_on_response", "Got AgentCheckin at {0}".format(message.timestamp))
-                agentUpdated = json.loads(message.body)
-                log("rabbitmq-consumer:_on_response", "Publishing message: {0}".format(str(agentUpdated)))
-                self.socketio.emit('agentUpdated', agentUpdated)
-
+            # AGENT COMMANDS UPDATED
             elif message.properties['message_type'] == 'AgentCommandsUpdated':
                 log("rabbitmq-consumer:_on_response", "Got AgentCommandsUpdated at {0}".format(message.timestamp))
                 agentCommandsUpdated = json.loads(message.body)
                 log("rabbitmq-consumer:_on_response", "Publishing message: {0}".format(str(agentCommandsUpdated)))
                 self.socketio.emit('agentCommandsUpdated', agentCommandsUpdated, room=agentCommandsUpdated["AgentId"])
 
+            # AGENT UPDATED
+            elif message.properties['message_type'] == 'AgentUpdated':
+                log("rabbitmq-consumer:_on_response", "Got AgentUpdated at {0}".format(message.timestamp))
+                agentUpdated = json.loads(message.body)
+                log("rabbitmq-consumer:_on_response", "Publishing message: {0}".format(str(agentUpdated)))
+                self.socketio.emit('agentUpdated', agentUpdated)
+
+            # CONSOLE MESSAGE ANNOUNCEMENT
             elif message.properties['message_type'] == 'ConsoleMessageAnnouncement':
                 log("rabbitmq-consumer:_on_response", "Got ConsoleMessageAnnouncement")
                 message = json.loads(message.body)
@@ -149,6 +147,14 @@ class Consumer(object):
                 log("rabbitmq-consumer:_on_response", "Publishing message: {0}".format(str(consoleMessage)))
                 self.socketio.emit('consoleMessageAnnouncement', consoleMessage, room=consoleMessage["AgentId"])
 
+            # DEV PAYLOAD CREATED
+            elif message.properties['message_type'] == 'DevPayloadCreated':
+                log("rabbitmq-consumer:_on_response", "Got DevPayloadCreated at {0}".format(message.timestamp))
+                devPayloadComplete = json.loads(message.body)
+                log("rabbitmq-consumer:_on_response", "Publishing message: {0}".format(str(devPayloadComplete)))
+                self.socketio.emit('devPayloadCreated', devPayloadComplete)
+
+            # ERROR MESSAGE ANNOUNCEMENT
             elif message.properties['message_type'] == 'ErrorMessageAnnouncement':
                 log("rabbitmq-consumer:_on_response", "Got ErrorMessageAnnouncement at {0}".format(message.timestamp))
                 errorMessageAnnouncement = json.loads(message.body)
@@ -162,57 +168,60 @@ class Consumer(object):
                 else:
                     self.socketio.emit('errorMessageAnnouncement', errorMessageAnnouncement, broadcast=True)
 
+            # NEW FACTION FILE
             elif message.properties['message_type'] == 'NewFactionFile':
                 log("rabbitmq-consumer:_on_response", "Got NewFactionFile")
                 fileMessage = json.loads(message.body)
                 log("rabbitmq-consumer:_on_response", "Emitting: {0}".format(message.body))
                 self.socketio.emit('newFile', fileMessage)
 
-            # elif message.properties['message_type'] == 'NewTransport':
-            #     log("rabbitmq-consumer:_on_response", "Got PayloadUpdate")
-            #     transportMessage = json.loads(message.body)
-            #     log("rabbitmq-consumer:_on_response", "Emitting: {0}".format(message.body))
-            #     self.socketio.emit('newTransport', transportMessage)
+            # NEW AGENT
+            elif message.properties['message_type'] == 'NewAgent':
+                log("rabbitmq-consumer:_on_response", "Got NewAgent at {0}".format(message.timestamp))
+                agent = json.loads(message.body)
+                agent['Success'] = True
+                log("rabbitmq-consumer:_on_response", "Publishing message: {0}".format(str(agent)))
+                self.socketio.emit('newAgent', agent, broadcast=True)
 
-            elif message.properties['message_type'] == 'PayloadUpdate':
-                log("rabbitmq-consumer:_on_response", "Got PayloadUpdate")
-                payloadUpdateMessage = json.loads(message.body)
+            # PAYLOAD CREATED
+            elif message.properties['message_type'] == 'PayloadCreated':
+                log("rabbitmq-consumer:_on_response", "Got PayloadCreated")
+                payloadMessage = json.loads(message.body)
                 log("rabbitmq-consumer:_on_response", "Emitting: {0}".format(message.body))
-                self.socketio.emit('updatePayload', payloadUpdateMessage)
+                self.socketio.emit('payloadCreated', payloadMessage)
 
+            # PAYLOAD UPDATED
             elif message.properties['message_type'] == 'PayloadUpdated':
                 log("rabbitmq-consumer:_on_response", "Got PayloadUpdate")
                 payloadUpdateMessage = json.loads(message.body)
                 log("rabbitmq-consumer:_on_response", "Emitting: {0}".format(message.body))
                 self.socketio.emit('payloadUpdated', payloadUpdateMessage)
 
+            # TRANSPORT CREATED
             elif message.properties['message_type'] == 'TransportCreated':
                 log("rabbitmq-consumer:_on_response", "Got TransportCreated")
                 transportMessage = json.loads(message.body)
                 log("rabbitmq-consumer:_on_response", "Emitting: {0}".format(message.body))
                 self.socketio.emit('transportCreated', transportMessage)
 
+            # TRANSPORT UPDATED
             elif message.properties['message_type'] == 'TransportUpdated':
                 log("rabbitmq-consumer:_on_response", "Got TransportUpdated")
                 transportMessage = json.loads(message.body)
                 log("rabbitmq-consumer:_on_response", "Emitting: {0}".format(message.body))
                 self.socketio.emit('transportUpdated', transportMessage)
 
+            # AGENT CHECKIN ANNOUNCEMENT
+            # TODO: Why aren't we doing anything with this?
             elif message.properties['message_type'] == 'AgentCheckinAnnouncement':
                 log("rabbitmq-consumer:_on_response", "Got AgentCheckinAnnouncement!")
 
+            # AGENT TASKUPDATE
+            # TODO: Why aren't we doing anything with this?
             elif message.properties['message_type'] == 'AgentTaskUpdate':
                 log("rabbitmq-consumer:_on_response", "Got AgentTaskUpdate")
         except Exception as e:
             log("rabbitmq-consumer:_on_response", "ERROR PROCESSING RABBITMQ MESSAGE: {0}".format(e))
-
-            # cmd_obj = json.loads(message.body)
-            # cmd_obj['Username'] = 'AGENT'
-            # log('rabbitmq-consumer', 'emitting. AgentId ' + str(cmd_obj['AgentId']) + ' Body:  {0}'.format(message.body)
-            # self.socketio.emit('newMessage', cmd_obj, room=cmd_obj['AgentId'])
-        # else:
-        #     log('rabbitmq-consumer', 'Not for us.. nacking..')
-        #     message.nack()
 
 
 rabbit_consumer = Consumer()
