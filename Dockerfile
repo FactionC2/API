@@ -1,6 +1,6 @@
 ﻿# Largely taken from https://sebest.github.io/post/protips-using-gunicorn-inside-a-docker-image/
 
-FROM alpine:3.8
+FROM alpine:3.11
 
 # server specific variables
 ENV GUNICORN_SERVER gunicorn
