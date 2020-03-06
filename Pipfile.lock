@@ -430,10 +430,11 @@
         },
         "shortuuid": {
             "hashes": [
-                "sha256:d08fd398f40f8baf87e15eef8355e92fa541bca4eb8465fefab7ee22f92711b9"
+                "sha256:a70bed12ef8e61e7ca573ed8122227f2e0bc83aef87dedccffb5afaca912dda7",
+                "sha256:d733aec4bda8212ef1d4f1edd0696061df377336a7897837b0d7757f35330543"
             ],
             "index": "pypi",
-            "version": "==0.5.0"
+            "version": "==0.5.1"
         },
         "six": {
             "hashes": [
