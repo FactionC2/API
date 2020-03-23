@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c45cc71d195311f9ff09c89127930f7e4723ae2022025f4f1b385d3770f786e6"
+            "sha256": "d11c8a3eb1c19648cdc3d3c8a77defb79e1699c202c95874c81a43e01628be2b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -388,11 +388,11 @@
         },
         "python-socketio": {
             "hashes": [
-                "sha256:690789c556b3ee7d425ffa8a735ff48a9b135486375028f7349d9b9cfc5aa627",
-                "sha256:728c0140c4456bafac241eea04752e7a4a6f91a18c15ad553bf6a51bcd4e1ed7"
+                "sha256:149b98c33f8c3d09273fb4ebeb83781e4dc9411b56b27d9f058bec1bd1ed74b7",
+                "sha256:81280cbbb7018d8ecdd006bf6025979733d347c0f2612282c1e21f6ed7d3b55b"
             ],
             "index": "pypi",
-            "version": "==4.5.0"
+            "version": "==4.5.1"
         },
         "pytz": {
             "hashes": [
