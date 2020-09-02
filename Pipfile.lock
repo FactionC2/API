@@ -119,11 +119,11 @@
         },
         "eventlet": {
             "hashes": [
-                "sha256:4f4a43366b4cbd4a3f2f231816e5c3dae8ab316df9b7da11f0525e2800559f33",
-                "sha256:faa384fdd8e5797ab1f16979576fc93ce89a7e1e5622d345caec1bf767a274fd"
+                "sha256:0fb3edef033f5ac3db5a4de187147499c9f2527daad8c4e3c3b030fa8efa74ef",
+                "sha256:a6e895ee88fdfd5bfcd24e5f53206a3e0724627c147860faa3aa30b4819b7143"
             ],
             "index": "pypi",
-            "version": "==0.26.1"
+            "version": "==0.27.0"
         },
         "flask": {
             "hashes": [
