@@ -26,11 +26,11 @@
         },
         "amqpstorm": {
             "hashes": [
-                "sha256:816b4a9087c1e9f9ca6ec24d7a5fd3f6d7b9bd3bffdea6fcbde6cb370f0bdd2f",
-                "sha256:bb3dd80747681ac59d6d42fcc0fff2de79236e0893fac1f431975afd893f2dc0"
+                "sha256:4422b80f0c63958f815d449f0a312c3be6f1efaef13c4d6e56ee6de704437f21",
+                "sha256:e2aae36d87136d1ba470a1d2fc8063b41520c8e446589f2eddaf7ebfa4e4f52c"
             ],
             "index": "pypi",
-            "version": "==2.8.2"
+            "version": "==2.8.3"
         },
         "aniso8601": {
             "hashes": [
